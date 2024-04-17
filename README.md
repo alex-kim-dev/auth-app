@@ -7,7 +7,7 @@ Based on my [vite-react-template](https://github.com/alex-kim-dev/vite-react-tem
 ## Requirements
 
 - [x] Typescript + React + Bootstrap
-- [ ] Register & login forms
+- [x] Register & login forms
 - [ ] User management table:
   - [ ] id, name, e-mail, last login time, registration time, status (active/blocked)
   - [ ] The leftmost column of the table should contains checkboxes without labels for multiple selection (table header contains only checkbox without label that selects or deselects all records).

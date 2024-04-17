@@ -5,31 +5,43 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink } from 'react-router-dom';
 import { z } from 'zod';
 
-const schema = z.object({
-  email: z.string().email('Please provide a valid email'),
-  password: z
-    .string()
-    .min(1, 'Password should be at least 1 character long')
-    .regex(/^[a-zA-Z]+$/, 'Password should consist of latin characters'),
-});
+const schema = z
+  .object({
+    email: z.string().email('Please provide a valid email'),
+    name: z
+      .string()
+      .min(1, 'Name should be at least 1 character long')
+      .regex(/^[a-zA-Z]+$/, 'Name should consist of latin characters'),
+    password: z
+      .string()
+      .min(1, 'Password should be at least 1 character long')
+      .regex(/^[a-zA-Z]+$/, 'Password should consist of latin characters'),
+    passwordConfirm: z
+      .string()
+      .min(1, 'Password should be at least 1 character long'),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    path: ['passwordConfirm'],
+    message: 'Passwords should match',
+  });
 
-type LoginInputs = z.infer<typeof schema>;
+type RegisterInputs = z.infer<typeof schema>;
 
-export const LoginPage: React.FC = () => {
+export const RegisterPage: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, isSubmitted, errors },
-  } = useForm<LoginInputs>({
+  } = useForm<RegisterInputs>({
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
 
   useLayoutEffect(() => {
-    document.title = 'Auth app | Login';
+    document.title = 'Auth app | Register';
   });
 
-  const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
+  const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
     if (isSubmitting) return;
 
     console.info('Triggered onSubmit with:');
@@ -48,12 +60,13 @@ export const LoginPage: React.FC = () => {
             className='d-flex flex-column align max-w-form m-auto'
             noValidate
             onSubmit={handleSubmit(onSubmit)}>
-            <h1 className='align-self-center mb-5'>Log in</h1>
+            <h1 className='align-self-center mb-5'>Register</h1>
             <div className='mb-4'>
               <label className='visually-hidden' htmlFor='email'>
                 email
               </label>
               <input
+                aria-describedby='emailHelp'
                 className={cn('form-control', {
                   'is-valid': isSubmitted && !errors.email,
                   'is-invalid': errors.email,
@@ -64,6 +77,25 @@ export const LoginPage: React.FC = () => {
                 {...register('email')}
               />
               <div className='invalid-feedback'>{errors.email?.message}</div>
+              <div className='form-text' id='emailHelp'>
+                This app doesn&apos;t verify emails, you can use any
+              </div>
+            </div>
+            <div className='mb-4'>
+              <label className='visually-hidden' htmlFor='name'>
+                name
+              </label>
+              <input
+                className={cn('form-control', {
+                  'is-valid': isSubmitted && !errors.name,
+                  'is-invalid': errors.name,
+                })}
+                id='name'
+                placeholder='Name'
+                type='text'
+                {...register('name')}
+              />
+              <div className='invalid-feedback'>{errors.name?.message}</div>
             </div>
             <div className='mb-4'>
               <label className='visually-hidden' htmlFor='password'>
@@ -81,6 +113,24 @@ export const LoginPage: React.FC = () => {
               />
               <div className='invalid-feedback'>{errors.password?.message}</div>
             </div>
+            <div className='mb-4'>
+              <label className='visually-hidden' htmlFor='password2'>
+                password confirmation
+              </label>
+              <input
+                className={cn('form-control', {
+                  'is-valid': isSubmitted && !errors.passwordConfirm,
+                  'is-invalid': errors.passwordConfirm,
+                })}
+                id='password2'
+                placeholder='Confirm password'
+                type='password'
+                {...register('passwordConfirm')}
+              />
+              <div className='invalid-feedback'>
+                {errors.passwordConfirm?.message}
+              </div>
+            </div>
             <button
               className='btn btn-primary mb-5'
               disabled={isSubmitting}
@@ -91,14 +141,14 @@ export const LoginPage: React.FC = () => {
                     aria-hidden='true'
                     className='spinner-border spinner-border-sm me-2'
                   />
-                  <span role='status'>Singing in...</span>
+                  <span role='status'>Registering...</span>
                 </>
               ) : (
                 'Submit'
               )}
             </button>
-            <NavLink className='align-self-center' to='/register'>
-              Register a new account
+            <NavLink className='align-self-center' to='/'>
+              Log in
             </NavLink>
           </form>
         </div>
