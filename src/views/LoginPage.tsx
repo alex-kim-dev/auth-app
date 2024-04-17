@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import cn from 'clsx';
 import { useLayoutEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -24,6 +24,7 @@ export const LoginPage: React.FC = () => {
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Login';
@@ -36,7 +37,10 @@ export const LoginPage: React.FC = () => {
     console.info(data);
 
     await new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), 1500);
+      setTimeout(() => {
+        navigate('/users');
+        resolve();
+      }, 1500);
     });
   };
 
