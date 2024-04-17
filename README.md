@@ -6,7 +6,7 @@ Based on my [vite-react-template](https://github.com/alex-kim-dev/vite-react-tem
 
 ## Requirements
 
-- [ ] Typescript + React + Bootstrap
+- [x] Typescript + React + Bootstrap
 - [ ] Register & login forms
 - [ ] User management table:
   - [ ] id, name, e-mail, last login time, registration time, status (active/blocked)

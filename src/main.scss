@@ -1,0 +1,6 @@
+@use 'sass:map';
+@import 'bootstrap/scss/bootstrap';
+
+.max-w-sm {
+  max-width: map.get($grid-breakpoints, 'sm');
+}
