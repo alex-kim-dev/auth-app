@@ -57,7 +57,7 @@ jobs:
 
       - name: Lint styles
         if: always() && steps.install.outcome == 'success'
-        run: npm run lint:styles
+        run: npm run lint:styles -- --allow-empty-input
 
       - name: Format
         if: always() && steps.install.outcome == 'success'
@@ -101,7 +101,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npm run test:ci
+        run: npm run test:ci -- --passWithNoTests
 
   build:
     name: Build

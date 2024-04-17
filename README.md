@@ -1,47 +1,19 @@
-[![Depfu](https://badges.depfu.com/badges/4b1166cf110842ec49787e0acf8f8723/overview.svg)](https://depfu.com/github/alex-kim-dev/vite-react-template?project_id=34571)
-[![CI](https://github.com/alex-kim-dev/vite-react-template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alex-kim-dev/vite-react-template/actions/workflows/ci.yml)
+[![CI](https://github.com/alex-kim-dev/auth-app/actions/workflows/ci.yml/badge.svg)](https://github.com/alex-kim-dev/auth-app/actions/workflows/ci.yml)
 
-# Vite React template
+# Auth app
 
-## Features
+Based on my [vite-react-template](https://github.com/alex-kim-dev/vite-react-template)
 
-- Vite
-  - html minification, EJS template
-  - import aliases
-  - importing SVGs as react components
-  - CSS / preprocessors / modules [support](https://vitejs.dev/guide/features.html#css)
-- React
-- Typescript
-- Vitest, Happy Dom, React Testing Library, test utils. In tests css processing is turned off.
-- Eslint: airbnb config, prettier integration, import & props sorting
-- Stylelint: standard config, prettier integration, css props sorting
-- Editorconfig & Prettier
-- Commitlint: conventional commits
-- pre-commit hook for linting/testing/typechecking staged files
-- CI on push & pr, in-progress workflow cancelling if a new one is queued, dependencies caching
-- pinned versions of dependencies
+## Requirements
 
-## Usage
-
-1. Click the `Use this template` button or clone locally:
-
-   ```sh
-   npx degit alex-kim-dev/vite-react-template vite-project
-   ```
-
-   Both methods will clean the git history.
-
-   _[degit](https://github.com/Rich-Harris/degit)_
-
-2. Update & install the dependencies:
-
-   ```sh
-   npx ncu -u && npm i
-   ```
-
-   _[npm-check-updates](https://github.com/raineorshine/npm-check-updates)_
-
-3. Change the name, description, author, license, links in `package.json`.
-4. Check out the available scripts in `package.json` or execute `npm run`.
-
-To add import aliases, edit `path` in `tsconfig.json`.
+- [ ] Typescript + React + Bootstrap
+- [ ] Register & login forms
+- [ ] User management table:
+  - [ ] id, name, e-mail, last login time, registration time, status (active/blocked)
+  - [ ] The leftmost column of the table should contains checkboxes without labels for multiple selection (table header contains only checkbox without label that selects or deselects all records).
+  - [ ] There must be a toolbar over the table with the following actions: Block (red button with text), Unblock (icon), Delete (icon).
+- [ ] Only authenticated users should have access the user management
+- [ ] All users should be able to block or delete themselves or any other user.
+- [ ] If user account is blocked or deleted any next user’s request should redirect to the login page.
+- [ ] User can use any non-empty password (even one character).
+- [ ] Blocked user should not be able to login, deleted user can re-register.
