@@ -4,3 +4,7 @@
 .max-w-sm {
   max-width: map.get($grid-breakpoints, 'sm');
 }
+
+.max-w-form {
+  max-width: 350px;
+}
