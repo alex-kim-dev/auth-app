@@ -1,21 +1,53 @@
-import { useLayoutEffect } from 'react';
+import { type MouseEventHandler, useLayoutEffect, useState } from 'react';
 import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
 
-import { IconButton } from '~/components/IconButton';
+import { IconButton } from '~/components';
+import { useAuth } from '~/contexts/auth';
 
 export const UsersPage: React.FC = () => {
+  const [isLoggingOut, setLogOut] = useState(false);
+  const navigate = useNavigate();
+  const { session, logOut } = useAuth();
+  const userName = session?.user.user_metadata.name || 'Anonymous';
+
   useLayoutEffect(() => {
     document.title = 'Auth app | Users table';
   });
+
+  const handleLogOut: MouseEventHandler<HTMLButtonElement> = async () => {
+    setLogOut(true);
+
+    const { error } = await logOut();
+
+    if (error) {
+      setLogOut(false);
+      console.error(error);
+    } else navigate('/');
+  };
 
   return (
     <>
       <header className='navbar bg-body-secondary mb-4 mb-md-5'>
         <div className='container justify-content-start'>
           <span className='navbar-brand flex-grow-1'>Auth app</span>
-          <span className='navbar-text me-3'>Hello, &lt;user&gt;!</span>
-          <button className='btn btn-outline-primary' type='button'>
-            Log out
+          <span className='navbar-text me-3'>Hello, {userName}!</span>
+          <button
+            className='btn btn-outline-primary'
+            disabled={isLoggingOut}
+            type='button'
+            onClick={handleLogOut}>
+            {isLoggingOut ? (
+              <>
+                <span
+                  aria-hidden='true'
+                  className='spinner-border spinner-border-sm me-2'
+                />
+                <span role='status'>Logging out...</span>
+              </>
+            ) : (
+              'Log out'
+            )}
           </button>
         </div>
       </header>

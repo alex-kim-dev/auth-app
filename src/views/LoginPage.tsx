@@ -5,6 +5,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import { useAuth } from '~/contexts/auth';
+
 const schema = z.object({
   email: z.string().email('Please provide a valid email'),
   password: z
@@ -24,24 +26,20 @@ export const LoginPage: React.FC = () => {
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
+  const { logIn } = useAuth();
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Login';
   });
 
-  const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
+  const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     if (isSubmitting) return;
 
-    console.info('Triggered onSubmit with:');
-    console.info(data);
+    const { error } = await logIn({ email, password });
 
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        navigate('/users');
-        resolve();
-      }, 1500);
-    });
+    if (error) console.error(error);
+    else navigate('/users');
   };
 
   return (

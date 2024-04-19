@@ -5,6 +5,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import { useAuth } from '~/contexts/auth';
+
 const schema = z
   .object({
     email: z.string().email('Please provide a valid email'),
@@ -14,11 +16,11 @@ const schema = z
       .regex(/^[a-zA-Z]+$/, 'Name should consist of latin characters'),
     password: z
       .string()
-      .min(1, 'Password should be at least 1 character long')
+      .min(6, 'Password should be at least 6 character long')
       .regex(/^[a-zA-Z]+$/, 'Password should consist of latin characters'),
     passwordConfirm: z
       .string()
-      .min(1, 'Password should be at least 1 character long'),
+      .min(6, 'Password should be at least 6 character long'),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     path: ['passwordConfirm'],
@@ -36,24 +38,32 @@ export const RegisterPage: React.FC = () => {
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
+  const { register: signUp } = useAuth();
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Register';
   });
 
-  const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
+  const onSubmit: SubmitHandler<RegisterInputs> = async ({
+    email,
+    password,
+    name,
+  }) => {
     if (isSubmitting) return;
 
-    console.info('Triggered onSubmit with:');
-    console.info(data);
-
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        navigate('/users');
-        resolve();
-      }, 1500);
+    const { error } = await signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
     });
+
+    if (error) console.error(error);
+    else navigate('/users');
   };
 
   return (
