@@ -1,32 +1,19 @@
-import type {
-  Session,
-  SignInWithPasswordCredentials,
-  SignUpWithPasswordCredentials,
-} from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { supabase } from '~/services/supabase';
-
-const logIn = (credentials: SignInWithPasswordCredentials) =>
-  supabase.auth.signInWithPassword(credentials);
-
-const register = (credentials: SignUpWithPasswordCredentials) =>
-  supabase.auth.signUp(credentials);
-
-const logOut = () => supabase.auth.signOut();
+import { auth, supabase } from '~/services/supabase';
 
 interface AuthContextValue {
   session: Session | null;
-  logIn: typeof logIn;
-  register: typeof register;
-  logOut: typeof logOut;
+  logIn: typeof auth.logIn;
+  register: typeof auth.register;
+  logOut: typeof auth.logOut;
+  getUsers: typeof auth.getUsers;
 }
 
 export const AuthContext = createContext<AuthContextValue>({
   session: null,
-  logIn,
-  register,
-  logOut,
+  ...auth,
 });
 
 export const useAuth = () => {
@@ -37,10 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [session, setSession] = useState<Session | null>(null);
-  const value = useMemo(
-    () => ({ session, logIn, register, logOut }),
-    [session],
-  );
+  const value = useMemo(() => ({ session, ...auth }), [session]);
 
   useEffect(() => {
     const {

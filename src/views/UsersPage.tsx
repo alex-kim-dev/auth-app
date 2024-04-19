@@ -1,19 +1,45 @@
-import { type MouseEventHandler, useLayoutEffect, useState } from 'react';
+import type { User } from '@supabase/supabase-js';
+import {
+  type MouseEventHandler,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
-import { IconButton } from '~/components';
+import { IconButton, UsersTable } from '~/components';
 import { useAuth } from '~/contexts/auth';
 
 export const UsersPage: React.FC = () => {
   const [isLoggingOut, setLogOut] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const { session, logOut, getUsers } = useAuth();
   const navigate = useNavigate();
-  const { session, logOut } = useAuth();
+
   const userName = session?.user.user_metadata.name || 'Anonymous';
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Users table';
   });
+
+  const loadUsers = useCallback(async () => {
+    setLoading(true);
+
+    const { data, error } = await getUsers();
+
+    if (error) console.error(error);
+    else {
+      setUsers(data.users);
+      setLoading(false);
+    }
+  }, [getUsers]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const handleLogOut: MouseEventHandler<HTMLButtonElement> = async () => {
     setLogOut(true);
@@ -74,65 +100,18 @@ export const UsersPage: React.FC = () => {
                 icon={TrashFill}
                 title='delete'
               />
+              {isLoading && (
+                <div className='navbar-text text-secondary' role='status'>
+                  <span
+                    aria-hidden='true'
+                    className='spinner-border spinner-border-sm me-1'
+                  />
+                  Loading users...
+                </div>
+              )}
             </div>
-            <div className=' overflow-auto'>
-              <table className='table table-light mb-0'>
-                <thead className='text-nowrap'>
-                  <tr>
-                    <th scope='col'>
-                      <input
-                        aria-label='select all table'
-                        className='form-check-input'
-                        type='checkbox'
-                        value='select'
-                      />
-                    </th>
-                    <th scope='col'>ID</th>
-                    <th scope='col'>Name</th>
-                    <th scope='col'>Email</th>
-                    <th scope='col'>Last login</th>
-                    <th scope='col'>Registered at</th>
-                    <th scope='col'>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope='row'>
-                      <input
-                        aria-label='select user with name ...'
-                        className='form-check-input'
-                        type='checkbox'
-                        value='select'
-                      />
-                    </th>
-                    <th scope='row'>0</th>
-                    <td>Mark</td>
-                    <td>mark@email.com</td>
-                    <td>{new Date(2024, 3, 5).toLocaleString()}</td>
-                    <td>{new Date(2024, 0, 8, 15, 43, 15).toLocaleString()}</td>
-                    <td>blocked</td>
-                  </tr>
-                  <tr className='table-active'>
-                    <th scope='row'>
-                      <input
-                        aria-label='select user with name ...'
-                        className='form-check-input'
-                        type='checkbox'
-                        value='select'
-                        defaultChecked
-                      />
-                    </th>
-                    <th scope='row'>1</th>
-                    <td>Jacob</td>
-                    <td>jacob@email.com</td>
-                    <td>{new Date().toLocaleString()}</td>
-                    <td>
-                      {new Date(2023, 11, 29, 5, 16, 56).toLocaleString()}
-                    </td>
-                    <td>active</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className='overflow-auto'>
+              <UsersTable users={users} />
             </div>
           </div>
         </div>
