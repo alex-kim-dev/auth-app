@@ -9,6 +9,8 @@ interface AuthContextValue {
   register: typeof auth.register;
   logOut: typeof auth.logOut;
   getUsers: typeof auth.getUsers;
+  setUserBan: typeof auth.setUserBan;
+  deleteUser: typeof auth.deleteUser;
 }
 
 export const AuthContext = createContext<AuthContextValue>({

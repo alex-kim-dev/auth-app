@@ -9,7 +9,9 @@ export const transformUsers = (users: SupabaseUser[]) => {
       ? new Date(user.last_sign_in_at).toLocaleString()
       : '—',
     createdAt: new Date(user.created_at).toLocaleString(),
-    blocked: user?.banned_until ? 'blocked' : 'active',
+    blocked: (user?.banned_until ? 'blocked' : 'active') as
+      | 'blocked'
+      | 'active',
     selected: false,
   }));
 };

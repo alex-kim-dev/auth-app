@@ -4,6 +4,9 @@ import type {
 } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
 
+const BAN = '876000h';
+const UNBAN = 'none';
+
 export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_KEY,
@@ -24,5 +27,15 @@ export const auth = {
 
   getUsers() {
     return supabase.auth.admin.listUsers();
+  },
+
+  setUserBan(id: string, ban: boolean) {
+    return supabase.auth.admin.updateUserById(id, {
+      ban_duration: ban ? BAN : UNBAN,
+    });
+  },
+
+  deleteUser(id: string) {
+    return supabase.auth.admin.deleteUser(id);
   },
 };

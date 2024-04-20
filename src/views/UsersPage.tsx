@@ -16,7 +16,7 @@ export const UsersPage: React.FC = () => {
   const [isLoggingOut, setLogOut] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
-  const { session, logOut, getUsers } = useAuth();
+  const { session, logOut, getUsers, setUserBan, deleteUser } = useAuth();
   const navigate = useNavigate();
 
   const userName = session?.user.user_metadata.name || 'Anonymous';
@@ -52,6 +52,40 @@ export const UsersPage: React.FC = () => {
     } else navigate('/');
   };
 
+  const handleBlock =
+    (block: boolean): MouseEventHandler<HTMLButtonElement> =>
+    async () => {
+      const selected = users
+        .filter((user) => user.selected)
+        .filter(
+          (user) =>
+            (block && user.blocked === 'active') ||
+            (!block && user.blocked === 'blocked'),
+        );
+
+      if (selected.length === 0) return;
+
+      try {
+        await Promise.all(selected.map((user) => setUserBan(user.id, block)));
+        loadUsers();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = async () => {
+    const selected = users.filter((user) => user.selected);
+
+    if (selected.length === 0) return;
+
+    try {
+      await Promise.all(selected.map((user) => deleteUser(user.id)));
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <header className='navbar bg-body-secondary mb-4 mb-md-5'>
@@ -85,7 +119,10 @@ export const UsersPage: React.FC = () => {
               aria-label='Users table toolbar'
               className='btn-toolbar gap-2 mb-3 mb-md-4'
               role='toolbar'>
-              <IconButton className='btn btn-primary' icon={LockFill}>
+              <IconButton
+                className='btn btn-primary'
+                icon={LockFill}
+                onClick={handleBlock(true)}>
                 Block
               </IconButton>
               <IconButton
@@ -93,12 +130,14 @@ export const UsersPage: React.FC = () => {
                 className='btn btn-primary'
                 icon={UnlockFill}
                 title='unblock'
+                onClick={handleBlock(false)}
               />
               <IconButton
                 aria-label='delete'
                 className='btn btn-danger'
                 icon={TrashFill}
                 title='delete'
+                onClick={handleDelete}
               />
               {isLoading && (
                 <div className='navbar-text text-secondary' role='status'>

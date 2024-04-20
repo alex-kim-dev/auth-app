@@ -1,5 +1,9 @@
 import cn from 'clsx';
-import { type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
+import {
+  type ChangeEventHandler,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 
 import { type User } from '~/utils';
 
@@ -11,17 +15,17 @@ interface UsersTableProps {
 export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
   const selectedAll = users.every((user) => user.selected);
 
-  const handleSelectAll = ({
+  const handleSelectAll: ChangeEventHandler<HTMLInputElement> = ({
     currentTarget,
-  }: ChangeEvent<HTMLInputElement>) => {
+  }) => {
     setUsers((prevUsers) =>
       prevUsers.map((user) => ({ ...user, selected: currentTarget.checked })),
     );
   };
 
   const handleSelectRow =
-    (id: string) =>
-    ({ currentTarget }: ChangeEvent<HTMLInputElement>) => {
+    (id: string): ChangeEventHandler<HTMLInputElement> =>
+    ({ currentTarget }) => {
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === id ? { ...user, selected: currentTarget.checked } : user,
