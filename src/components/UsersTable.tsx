@@ -1,10 +1,34 @@
-import type { User } from '@supabase/supabase-js';
+import cn from 'clsx';
+import { type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
+
+import { type User } from '~/utils';
 
 interface UsersTableProps {
   users: User[];
+  setUsers: Dispatch<SetStateAction<User[]>>;
 }
 
-export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
+  const selectedAll = users.every((user) => user.selected);
+
+  const handleSelectAll = ({
+    currentTarget,
+  }: ChangeEvent<HTMLInputElement>) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => ({ ...user, selected: currentTarget.checked })),
+    );
+  };
+
+  const handleSelectRow =
+    (id: string) =>
+    ({ currentTarget }: ChangeEvent<HTMLInputElement>) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === id ? { ...user, selected: currentTarget.checked } : user,
+        ),
+      );
+    };
+
   return (
     <table className='table table-light mb-0'>
       <thead className='text-nowrap'>
@@ -12,9 +36,11 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
           <th scope='col'>
             <input
               aria-label='select all rows'
+              checked={selectedAll}
               className='form-check-input'
               type='checkbox'
               value='select'
+              onChange={handleSelectAll}
             />
           </th>
           <th scope='col'>ID</th>
@@ -26,28 +52,26 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
         </tr>
       </thead>
       <tbody>
-        {users.map((user) => (
-          <tr key={user.id}>
+        {users.map(({ id, ...user }) => (
+          <tr key={id} className={cn({ 'table-active': user.selected })}>
             <th>
               <input
                 aria-label='select row'
+                checked={user.selected}
                 className='form-check-input'
                 type='checkbox'
                 value='select'
+                onChange={handleSelectRow(id)}
               />
             </th>
-            <th className='max-w-id text-truncate' scope='row' title={user.id}>
-              {user.id}
+            <th className='max-w-id text-truncate' scope='row' title={id}>
+              {id}
             </th>
-            <td>{user.user_metadata.name ?? 'Anonymous'}</td>
+            <td>{user.name}</td>
             <td>{user.email}</td>
-            <td>
-              {user.last_sign_in_at
-                ? new Date(user.last_sign_in_at).toLocaleString()
-                : '—'}
-            </td>
-            <td>{new Date(user.created_at).toLocaleString()}</td>
-            <td>{user?.banned_until ? 'blocked' : 'active'}</td>
+            <td>{user.lastLoginAt}</td>
+            <td>{user.createdAt}</td>
+            <td>{user.blocked}</td>
           </tr>
         ))}
       </tbody>

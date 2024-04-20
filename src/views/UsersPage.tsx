@@ -1,4 +1,3 @@
-import type { User } from '@supabase/supabase-js';
 import {
   type MouseEventHandler,
   useCallback,
@@ -11,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { IconButton, UsersTable } from '~/components';
 import { useAuth } from '~/contexts/auth';
+import { transformUsers, type User } from '~/utils';
 
 export const UsersPage: React.FC = () => {
   const [isLoggingOut, setLogOut] = useState(false);
@@ -32,7 +32,7 @@ export const UsersPage: React.FC = () => {
 
     if (error) console.error(error);
     else {
-      setUsers(data.users);
+      setUsers(transformUsers(data.users));
       setLoading(false);
     }
   }, [getUsers]);
@@ -111,7 +111,7 @@ export const UsersPage: React.FC = () => {
               )}
             </div>
             <div className='overflow-auto'>
-              <UsersTable users={users} />
+              <UsersTable setUsers={setUsers} users={users} />
             </div>
           </div>
         </div>
