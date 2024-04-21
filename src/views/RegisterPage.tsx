@@ -5,6 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import { LoadingButton } from '~/components';
 import { useAuth } from '~/contexts/auth';
 
 const schema = z
@@ -145,22 +146,13 @@ export const RegisterPage: React.FC = () => {
                 {errors.passwordConfirm?.message}
               </div>
             </div>
-            <button
+            <LoadingButton
               className='btn btn-primary mb-5'
-              disabled={isSubmitting}
+              loading={isSubmitting}
+              loadingContent='Registering...'
               type='submit'>
-              {isSubmitting ? (
-                <>
-                  <span
-                    aria-hidden='true'
-                    className='spinner-border spinner-border-sm me-2'
-                  />
-                  <span role='status'>Registering...</span>
-                </>
-              ) : (
-                'Submit'
-              )}
-            </button>
+              Submit
+            </LoadingButton>
             <NavLink className='align-self-center' to='/'>
               Log in
             </NavLink>

@@ -8,7 +8,7 @@ import {
 import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 
-import { IconButton, UsersTable } from '~/components';
+import { IconButton, LoadingButton, UsersTable } from '~/components';
 import { useAuth } from '~/contexts/auth';
 import { transformUsers, type User } from '~/utils';
 
@@ -92,23 +92,13 @@ export const UsersPage: React.FC = () => {
         <div className='container justify-content-start'>
           <span className='navbar-brand flex-grow-1'>Auth app</span>
           <span className='navbar-text me-3'>Hello, {userName}!</span>
-          <button
+          <LoadingButton
             className='btn btn-outline-primary'
-            disabled={isLoggingOut}
-            type='button'
+            loading={isLoggingOut}
+            loadingContent='Logging out...'
             onClick={handleLogOut}>
-            {isLoggingOut ? (
-              <>
-                <span
-                  aria-hidden='true'
-                  className='spinner-border spinner-border-sm me-2'
-                />
-                <span role='status'>Logging out...</span>
-              </>
-            ) : (
-              'Log out'
-            )}
-          </button>
+            Log out
+          </LoadingButton>
         </div>
       </header>
       <main className='container'>
