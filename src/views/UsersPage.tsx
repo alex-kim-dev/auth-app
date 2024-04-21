@@ -13,8 +13,9 @@ import { useAuth } from '~/contexts/auth';
 import { transformUsers, type User } from '~/utils';
 
 export const UsersPage: React.FC = () => {
-  const [isLoggingOut, setLogOut] = useState(false);
+  const [isLoggingOut, setLogingOut] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [usersError, setUsersError] = useState<Error | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const { session, logOut, getUsers, setUserBan, deleteUser } = useAuth();
   const navigate = useNavigate();
@@ -27,14 +28,14 @@ export const UsersPage: React.FC = () => {
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
+    setUsersError(null);
 
     const { data, error } = await getUsers();
 
-    if (error) console.error(error);
-    else {
-      setUsers(transformUsers(data.users));
-      setLoading(false);
-    }
+    if (error) setUsersError(error);
+    else setUsers(transformUsers(data.users));
+
+    setLoading(false);
   }, [getUsers]);
 
   useEffect(() => {
@@ -42,14 +43,12 @@ export const UsersPage: React.FC = () => {
   }, [loadUsers]);
 
   const handleLogOut: MouseEventHandler<HTMLButtonElement> = async () => {
-    setLogOut(true);
+    setLogingOut(true);
 
     const { error } = await logOut();
 
-    if (error) {
-      setLogOut(false);
-      console.error(error);
-    } else navigate('/');
+    if (error) setLogingOut(false);
+    else navigate('/');
   };
 
   const handleBlock =
@@ -129,15 +128,20 @@ export const UsersPage: React.FC = () => {
                 title='delete'
                 onClick={handleDelete}
               />
-              {isLoading && (
-                <div className='navbar-text text-secondary' role='status'>
-                  <span
-                    aria-hidden='true'
-                    className='spinner-border spinner-border-sm me-1'
-                  />
-                  Loading users...
-                </div>
-              )}
+              <div className='navbar-text text-secondary' role='status'>
+                {isLoading && (
+                  <>
+                    <span
+                      aria-hidden='true'
+                      className='spinner-border spinner-border-sm me-1'
+                    />
+                    Loading users...
+                  </>
+                )}
+                {usersError && (
+                  <span className='text-danger'>{usersError.message}</span>
+                )}
+              </div>
             </div>
             <div className='overflow-auto'>
               <UsersTable setUsers={setUsers} users={users} />

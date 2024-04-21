@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import cn from 'clsx';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -39,6 +39,7 @@ export const RegisterPage: React.FC = () => {
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
+  const [registerError, setRegisterError] = useState<Error | null>(null);
   const { register: signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -52,6 +53,7 @@ export const RegisterPage: React.FC = () => {
     name,
   }) => {
     if (isSubmitting) return;
+    setRegisterError(null);
 
     const { error } = await signUp({
       email,
@@ -63,7 +65,7 @@ export const RegisterPage: React.FC = () => {
       },
     });
 
-    if (error) console.error(error);
+    if (error) setRegisterError(error);
     else navigate('/users');
   };
 
@@ -147,13 +149,18 @@ export const RegisterPage: React.FC = () => {
               </div>
             </div>
             <LoadingButton
-              className='btn btn-primary mb-5'
+              className='btn btn-primary mb-3'
               loading={isSubmitting}
               loadingContent='Registering...'
               type='submit'>
               Submit
             </LoadingButton>
-            <NavLink className='align-self-center' to='/'>
+            {registerError && (
+              <div className='text-danger text-center'>
+                {registerError.message}
+              </div>
+            )}
+            <NavLink className='align-self-center mt-5' to='/'>
               Log in
             </NavLink>
           </form>

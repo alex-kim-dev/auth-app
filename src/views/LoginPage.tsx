@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import cn from 'clsx';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -27,6 +27,7 @@ export const LoginPage: React.FC = () => {
     resolver: zodResolver(schema),
     criteriaMode: 'all',
   });
+  const [loginError, setLoginError] = useState<Error | null>(null);
   const { logIn } = useAuth();
   const navigate = useNavigate();
 
@@ -36,10 +37,11 @@ export const LoginPage: React.FC = () => {
 
   const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     if (isSubmitting) return;
+    setLoginError(null);
 
     const { error } = await logIn({ email, password });
 
-    if (error) console.error(error);
+    if (error) setLoginError(error);
     else navigate('/users');
   };
 
@@ -85,13 +87,18 @@ export const LoginPage: React.FC = () => {
               <div className='invalid-feedback'>{errors.password?.message}</div>
             </div>
             <LoadingButton
-              className='btn btn-primary mb-5'
+              className='btn btn-primary mb-3'
               loading={isSubmitting}
               loadingContent='Singing in...'
               type='submit'>
               Submit
             </LoadingButton>
-            <NavLink className='align-self-center' to='/register'>
+            {loginError && (
+              <div className='text-danger text-center'>
+                {loginError.message}
+              </div>
+            )}
+            <NavLink className='align-self-center mt-5' to='/register'>
               Register a new account
             </NavLink>
           </form>
