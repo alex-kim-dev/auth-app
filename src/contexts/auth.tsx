@@ -3,15 +3,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { auth, supabase } from '~/services/supabase';
 
-interface AuthContextValue {
+type AuthContextValue = typeof auth & {
   session: Session | null;
-  logIn: typeof auth.logIn;
-  register: typeof auth.register;
-  logOut: typeof auth.logOut;
-  getUsers: typeof auth.getUsers;
-  setUserBan: typeof auth.setUserBan;
-  deleteUser: typeof auth.deleteUser;
-}
+};
 
 export const AuthContext = createContext<AuthContextValue>({
   session: null,
