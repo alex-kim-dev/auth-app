@@ -4,6 +4,8 @@
 
 Based on my [vite-react-template](https://github.com/alex-kim-dev/vite-react-template)
 
+https://github.com/alex-kim-dev/auth-app/assets/45559664/9a4e01f1-cb3f-4d8d-92c6-9ba56ee60f57
+
 ## Requirements
 
 - [x] Typescript + React + Bootstrap
