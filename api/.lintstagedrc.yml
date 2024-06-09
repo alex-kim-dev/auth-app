@@ -1,0 +1,5 @@
+'*.{js,ts}':
+  - eslint --config api/eslint.config.js --fix
+
+'*.{js,ts,html,json,yml,md}':
+  - prettier --config api/.prettierrc.yml --write
