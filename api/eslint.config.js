@@ -16,6 +16,12 @@ export default tseslint.config(
     },
     ignores: ['.vscode/', 'coverage/', 'dist/', 'node_modules/'],
     rules: {
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        {
+          checksVoidReturn: false,
+        },
+      ],
       '@typescript-eslint/restrict-template-expressions': 'off',
     },
   },
