@@ -28,6 +28,14 @@ export const schema = {
         ),
     }),
   }),
+
+  login: z.object({
+    body: z.object({
+      email: z.string({ required_error: 'Email is required' }),
+      password: z.string({ required_error: 'Password is required' }),
+    }),
+  }),
 };
 
 export type SignupCredentials = z.infer<typeof schema.signup>['body'];
+export type LoginCredentials = z.infer<typeof schema.login>['body'];

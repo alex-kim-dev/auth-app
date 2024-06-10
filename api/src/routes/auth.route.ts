@@ -7,3 +7,4 @@ import { schema } from '~/schemas';
 export const authRouter = Router();
 
 authRouter.post('/signup', validate(schema.signup), authController.signup);
+authRouter.post('/login', validate(schema.login), authController.login);
