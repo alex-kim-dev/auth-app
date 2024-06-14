@@ -6,3 +6,4 @@ import { authenticate } from '~/middleware';
 export const userRouter = Router();
 
 userRouter.get('/all', authenticate, userController.getAll);
+userRouter.delete('/:id', authenticate, userController.delete);

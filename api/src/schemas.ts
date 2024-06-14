@@ -43,8 +43,15 @@ export const schema = {
       }),
     }),
   }),
+
+  deleteUser: z.object({
+    params: z.object({
+      id: z.string({ required_error: 'User ID is required' }),
+    }),
+  }),
 };
 
 export type SignupReqBody = z.infer<typeof schema.signup>['body'];
 export type LoginReqBody = z.infer<typeof schema.login>['body'];
 export type RefreshReqCookies = z.infer<typeof schema.refresh>['cookies'];
+export type DeleteUserReqParams = z.infer<typeof schema.deleteUser>['params'];

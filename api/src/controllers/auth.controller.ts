@@ -174,7 +174,7 @@ const logout = async (req: Request, res: Response) => {
 
     await prisma.refreshToken.delete({ where: { userId: user.id } });
 
-    return res.status(204).send({ message: 'Successfully logged out' });
+    return res.sendStatus(204);
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'Internal server error' });
