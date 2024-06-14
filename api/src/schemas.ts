@@ -35,7 +35,16 @@ export const schema = {
       password: z.string({ required_error: 'Password is required' }),
     }),
   }),
+
+  refresh: z.object({
+    cookies: z.object({
+      refreshToken: z.string({
+        required_error: 'Refresh token cookie is required',
+      }),
+    }),
+  }),
 };
 
-export type SignupCredentials = z.infer<typeof schema.signup>['body'];
-export type LoginCredentials = z.infer<typeof schema.login>['body'];
+export type SignupReqBody = z.infer<typeof schema.signup>['body'];
+export type LoginReqBody = z.infer<typeof schema.login>['body'];
+export type RefreshReqCookies = z.infer<typeof schema.refresh>['cookies'];

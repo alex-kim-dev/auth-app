@@ -9,6 +9,7 @@ export const validate =
         body: req.body as unknown,
         query: req.query,
         params: req.params,
+        cookies: req.cookies as Record<string, unknown>,
       });
       next();
     } catch (error) {

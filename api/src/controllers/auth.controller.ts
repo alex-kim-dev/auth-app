@@ -4,7 +4,10 @@ import { randomBytes, createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
 import { env } from '~/env';
-import type { LoginCredentials, SignupCredentials } from '~/schemas';
+import type { LoginReqBody, SignupReqBody, RefreshReqCookies } from '~/schemas';
+
+const hashToken = (token: string) =>
+  createHash('sha3-256').update(token).digest('base64');
 
 const createTokens = (userId: string) => {
   const accessToken = jwt.sign({ userId }, env.AT_SECRET, {
@@ -12,16 +15,12 @@ const createTokens = (userId: string) => {
   });
 
   const refreshToken = randomBytes(32).toString('base64');
-  const hashed = createHash('sha3-256').update(refreshToken).digest('base64');
+  const hash = hashToken(refreshToken);
   const expiresAt = new Date(Date.now() + ms(env.RT_EXPIRATION));
 
   return {
-    accessToken,
-    refreshToken: {
-      value: refreshToken,
-      hashed,
-      expiresAt,
-    },
+    access: { value: accessToken },
+    refresh: { value: refreshToken, hash, expiresAt },
   };
 };
 
@@ -36,7 +35,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
 };
 
 const signup = async (
-  req: Request<object, object, SignupCredentials>,
+  req: Request<object, object, SignupReqBody>,
   res: Response,
 ) => {
   try {
@@ -58,18 +57,18 @@ const signup = async (
       select: { id: true, name: true },
     });
 
-    const { accessToken, refreshToken } = createTokens(user.id);
+    const tokens = createTokens(user.id);
 
     await prisma.refreshToken.create({
       data: {
-        hash: refreshToken.hashed,
-        expiresAt: refreshToken.expiresAt,
+        hash: tokens.refresh.hash,
+        expiresAt: tokens.refresh.expiresAt,
         user: { connect: { id: user.id } },
       },
     });
 
-    setRefreshTokenCookie(res, refreshToken.value);
-    return res.status(201).send({ ...user, accessToken });
+    setRefreshTokenCookie(res, tokens.refresh.value);
+    return res.status(201).send({ ...user, accessToken: tokens.access.value });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'Internal server error' });
@@ -77,7 +76,7 @@ const signup = async (
 };
 
 const login = async (
-  req: Request<object, object, LoginCredentials>,
+  req: Request<object, object, LoginReqBody>,
   res: Response,
 ) => {
   try {
@@ -96,18 +95,67 @@ const login = async (
       return res.status(401).send({ message: 'Invalid email or password' });
     }
 
-    const { accessToken, refreshToken } = createTokens(user.id);
+    const tokens = createTokens(user.id);
 
-    await prisma.refreshToken.create({
-      data: {
-        hash: refreshToken.hashed,
-        expiresAt: refreshToken.expiresAt,
+    await prisma.refreshToken.upsert({
+      create: {
+        hash: tokens.refresh.hash,
+        expiresAt: tokens.refresh.expiresAt,
         user: { connect: { id: user.id } },
       },
+      update: {
+        hash: tokens.refresh.hash,
+        expiresAt: tokens.refresh.expiresAt,
+      },
+      where: { userId: user.id },
     });
 
-    setRefreshTokenCookie(res, refreshToken.value);
-    return res.send({ id: user.id, name: user.name, accessToken });
+    setRefreshTokenCookie(res, tokens.refresh.value);
+    return res.send({
+      id: user.id,
+      name: user.name,
+      accessToken: tokens.access.value,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+const refresh = async (req: Request, res: Response) => {
+  try {
+    if (!req.prisma) throw new Error("Can't access prisma middleware");
+
+    const { prisma } = req;
+    const { refreshToken } = req.cookies as RefreshReqCookies;
+    const hash = hashToken(refreshToken);
+
+    const record = await prisma.refreshToken.findFirst({
+      where: { hash },
+      include: { user: { select: { id: true, name: true } } },
+    });
+
+    if (!record) return res.status(403).send({ message: 'Access forbidden' });
+
+    if (record.expiresAt <= new Date()) {
+      await prisma.refreshToken.delete({ where: { hash } });
+      return res.status(403).send({ message: 'Access forbidden' });
+    }
+
+    const { user } = record;
+    const tokens = createTokens(user.id);
+
+    await prisma.refreshToken.update({
+      data: { hash: tokens.refresh.hash, expiresAt: tokens.refresh.expiresAt },
+      where: { userId: user.id },
+    });
+
+    setRefreshTokenCookie(res, tokens.refresh.value);
+    return res.send({
+      id: user.id,
+      name: user.name,
+      accessToken: tokens.access.value,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'Internal server error' });
@@ -117,4 +165,5 @@ const login = async (
 export const authController = {
   signup,
   login,
+  refresh,
 };
