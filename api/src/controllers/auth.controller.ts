@@ -109,6 +109,10 @@ const login = async (
       },
       where: { userId: user.id },
     });
+    await prisma.user.update({
+      data: { lastLogin: new Date() },
+      where: { id: user.id },
+    });
 
     setRefreshTokenCookie(res, tokens.refresh.value);
     return res.send({
