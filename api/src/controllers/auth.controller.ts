@@ -85,11 +85,14 @@ const login = async (
     const { prisma } = req;
     const { email, password } = req.body;
 
-    const user = await prisma.user.findFirst({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     const isCorrectPassword = await bcrypt.compare(
       password,
       user?.password ?? '',
     );
+
+    if (user?.isBanned)
+      return res.status(403).send({ message: 'User is banned' });
 
     if (!user || !isCorrectPassword) {
       return res.status(401).send({ message: 'Invalid email or password' });
@@ -134,10 +137,13 @@ const refresh = async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies as RefreshReqCookies;
     const hash = hashToken(refreshToken);
 
-    const record = await prisma.refreshToken.findFirst({
+    const record = await prisma.refreshToken.findUnique({
       where: { hash },
-      include: { user: { select: { id: true, name: true } } },
+      include: { user: { select: { id: true, name: true, isBanned: true } } },
     });
+
+    if (record?.user.isBanned)
+      return res.status(403).send({ message: 'User is banned' });
 
     if (!record) return res.status(403).send({ message: 'Access forbidden' });
 
