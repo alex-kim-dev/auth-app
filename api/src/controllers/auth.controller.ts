@@ -162,8 +162,24 @@ const refresh = async (req: Request, res: Response) => {
   }
 };
 
+const logout = async (req: Request, res: Response) => {
+  try {
+    const { prisma, user } = req;
+    if (!prisma) throw new Error("Can't access prisma middleware");
+    if (!user?.id) throw new Error("Can't access user id");
+
+    await prisma.refreshToken.delete({ where: { userId: user.id } });
+
+    return res.status(204).send({ message: 'Successfully logged out' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
 export const authController = {
   signup,
   login,
   refresh,
+  logout,
 };
