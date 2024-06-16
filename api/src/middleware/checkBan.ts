@@ -1,11 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
+import HttpError from 'http-errors';
+import asyncHandler from 'express-async-handler';
 
-export const checkBan = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
+export const checkBan = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     if (!req.prisma) throw new Error("Can't access prisma middleware");
     if (!req.user?.id) throw new Error("Can't access user id");
 
@@ -14,14 +12,9 @@ export const checkBan = async (
       where: { id: req.user.id },
     });
 
-    if (!user) return res.status(404).send({ message: 'User not found' });
-
-    if (user.isBanned)
-      return res.status(403).send({ message: 'User is banned' });
+    if (!user) throw new HttpError.NotFound('User not found');
+    if (user.isBanned) throw new HttpError.Forbidden('User is banned');
 
     next();
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: 'Internal server error' });
-  }
-};
+  },
+);

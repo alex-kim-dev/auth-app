@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import { randomBytes, createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
+import HttpError from 'http-errors';
+import asyncHandler from 'express-async-handler';
 import { env } from '~/env';
 import type { LoginReqBody, SignupReqBody, RefreshReqCookies } from '~/schemas';
 
@@ -38,158 +40,130 @@ const signup = async (
   req: Request<object, object, SignupReqBody>,
   res: Response,
 ) => {
-  try {
-    if (!req.prisma) throw new Error("Can't access prisma middleware");
+  if (!req.prisma) throw new Error("Can't access prisma middleware");
 
-    const { prisma } = req;
-    const { email, name, password } = req.body;
+  const { prisma } = req;
+  const { email, name, password } = req.body;
 
-    const existingUser = await prisma.user.findFirst({ where: { email } });
-    if (existingUser) {
-      return res
-        .status(409)
-        .send({ message: 'A user with this email already exists' });
-    }
+  const existingUser = await prisma.user.findFirst({ where: { email } });
+  if (existingUser)
+    throw new HttpError.Conflict('A user with this email already exists');
 
-    const hashedPassword = await bcrypt.hash(password, env.SALT_ROUNDS);
-    const user = await prisma.user.create({
-      data: { email, name, password: hashedPassword },
-      select: { id: true, name: true },
-    });
+  const hashedPassword = await bcrypt.hash(password, env.SALT_ROUNDS);
+  const user = await prisma.user.create({
+    data: { email, name, password: hashedPassword },
+    select: { id: true, name: true },
+  });
 
-    const tokens = createTokens(user.id);
+  const tokens = createTokens(user.id);
 
-    await prisma.refreshToken.create({
-      data: {
-        hash: tokens.refresh.hash,
-        expiresAt: tokens.refresh.expiresAt,
-        user: { connect: { id: user.id } },
-      },
-    });
+  await prisma.refreshToken.create({
+    data: {
+      hash: tokens.refresh.hash,
+      expiresAt: tokens.refresh.expiresAt,
+      user: { connect: { id: user.id } },
+    },
+  });
 
-    setRefreshTokenCookie(res, tokens.refresh.value);
-    return res.status(201).send({ ...user, accessToken: tokens.access.value });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: 'Internal server error' });
-  }
+  setRefreshTokenCookie(res, tokens.refresh.value);
+  res.status(201).send({ ...user, accessToken: tokens.access.value });
 };
 
 const login = async (
   req: Request<object, object, LoginReqBody>,
   res: Response,
 ) => {
-  try {
-    if (!req.prisma) throw new Error("Can't access prisma middleware");
+  if (!req.prisma) throw new Error("Can't access prisma middleware");
 
-    const { prisma } = req;
-    const { email, password } = req.body;
+  const { prisma } = req;
+  const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    const isCorrectPassword = await bcrypt.compare(
-      password,
-      user?.password ?? '',
-    );
+  const user = await prisma.user.findUnique({ where: { email } });
+  const isCorrectPassword = await bcrypt.compare(
+    password,
+    user?.password ?? '',
+  );
 
-    if (user?.isBanned)
-      return res.status(403).send({ message: 'User is banned' });
+  if (user?.isBanned) throw new HttpError.Forbidden('User is banned');
+  if (!user || !isCorrectPassword)
+    throw new HttpError.Unauthorized('Invalid email or password');
 
-    if (!user || !isCorrectPassword) {
-      return res.status(401).send({ message: 'Invalid email or password' });
-    }
+  const tokens = createTokens(user.id);
 
-    const tokens = createTokens(user.id);
+  await prisma.refreshToken.upsert({
+    create: {
+      hash: tokens.refresh.hash,
+      expiresAt: tokens.refresh.expiresAt,
+      user: { connect: { id: user.id } },
+    },
+    update: {
+      hash: tokens.refresh.hash,
+      expiresAt: tokens.refresh.expiresAt,
+    },
+    where: { userId: user.id },
+  });
+  await prisma.user.update({
+    data: { lastLogin: new Date() },
+    where: { id: user.id },
+  });
 
-    await prisma.refreshToken.upsert({
-      create: {
-        hash: tokens.refresh.hash,
-        expiresAt: tokens.refresh.expiresAt,
-        user: { connect: { id: user.id } },
-      },
-      update: {
-        hash: tokens.refresh.hash,
-        expiresAt: tokens.refresh.expiresAt,
-      },
-      where: { userId: user.id },
-    });
-    await prisma.user.update({
-      data: { lastLogin: new Date() },
-      where: { id: user.id },
-    });
-
-    setRefreshTokenCookie(res, tokens.refresh.value);
-    return res.send({
-      id: user.id,
-      name: user.name,
-      accessToken: tokens.access.value,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: 'Internal server error' });
-  }
+  setRefreshTokenCookie(res, tokens.refresh.value);
+  res.send({
+    id: user.id,
+    name: user.name,
+    accessToken: tokens.access.value,
+  });
 };
 
 const refresh = async (req: Request, res: Response) => {
-  try {
-    if (!req.prisma) throw new Error("Can't access prisma middleware");
+  if (!req.prisma) throw new Error("Can't access prisma middleware");
 
-    const { prisma } = req;
-    const { refreshToken } = req.cookies as RefreshReqCookies;
-    const hash = hashToken(refreshToken);
+  const { prisma } = req;
+  const { refreshToken } = req.cookies as RefreshReqCookies;
+  const hash = hashToken(refreshToken);
 
-    const record = await prisma.refreshToken.findUnique({
-      where: { hash },
-      include: { user: { select: { id: true, name: true, isBanned: true } } },
-    });
+  const record = await prisma.refreshToken.findUnique({
+    where: { hash },
+    include: { user: { select: { id: true, name: true, isBanned: true } } },
+  });
 
-    if (record?.user.isBanned)
-      return res.status(403).send({ message: 'User is banned' });
+  if (record?.user.isBanned) throw new HttpError.Forbidden('User is banned');
+  if (!record) throw new HttpError.Forbidden('Access forbidden');
 
-    if (!record) return res.status(403).send({ message: 'Access forbidden' });
-
-    if (record.expiresAt <= new Date()) {
-      await prisma.refreshToken.delete({ where: { hash } });
-      return res.status(403).send({ message: 'Access forbidden' });
-    }
-
-    const { user } = record;
-    const tokens = createTokens(user.id);
-
-    await prisma.refreshToken.update({
-      data: { hash: tokens.refresh.hash, expiresAt: tokens.refresh.expiresAt },
-      where: { userId: user.id },
-    });
-
-    setRefreshTokenCookie(res, tokens.refresh.value);
-    return res.send({
-      id: user.id,
-      name: user.name,
-      accessToken: tokens.access.value,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: 'Internal server error' });
+  if (record.expiresAt <= new Date()) {
+    await prisma.refreshToken.delete({ where: { hash } });
+    res.status(403).send({ message: 'Access forbidden' });
   }
+
+  const { user } = record;
+  const tokens = createTokens(user.id);
+
+  await prisma.refreshToken.update({
+    data: { hash: tokens.refresh.hash, expiresAt: tokens.refresh.expiresAt },
+    where: { userId: user.id },
+  });
+
+  setRefreshTokenCookie(res, tokens.refresh.value);
+  res.send({
+    id: user.id,
+    name: user.name,
+    accessToken: tokens.access.value,
+  });
 };
 
 const logout = async (req: Request, res: Response) => {
-  try {
-    const { prisma, user } = req;
-    if (!prisma) throw new Error("Can't access prisma middleware");
-    if (!user?.id) throw new Error("Can't access user id");
+  const { prisma, user } = req;
+  if (!prisma) throw new Error("Can't access prisma middleware");
+  if (!user?.id) throw new Error("Can't access user id");
 
-    await prisma.refreshToken.delete({ where: { userId: user.id } });
+  await prisma.refreshToken.delete({ where: { userId: user.id } });
 
-    return res.sendStatus(204);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: 'Internal server error' });
-  }
+  res.sendStatus(204);
 };
 
 export const authController = {
-  signup,
-  login,
-  refresh,
-  logout,
+  signup: asyncHandler(signup),
+  login: asyncHandler(login),
+  refresh: asyncHandler(refresh),
+  logout: asyncHandler(logout),
 };

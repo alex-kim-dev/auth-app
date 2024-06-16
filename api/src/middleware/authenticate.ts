@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import HttpError from 'http-errors';
 import { env } from '~/env';
 
 export const authenticate = (
@@ -10,12 +11,11 @@ export const authenticate = (
   const authHeader = req.headers.authorization ?? '';
   const accessToken = authHeader.match(/^Bearer (.+)$/)?.[1];
 
-  if (!accessToken)
-    return res.status(401).send({ message: 'Not authenticated' });
+  if (!accessToken) throw new HttpError.Unauthorized('Not authenticated');
 
   jwt.verify(accessToken, env.AT_SECRET, (error, payload) => {
     if (error || !payload || typeof payload === 'string')
-      return res.status(403).send({ message: 'Invalid access token' });
+      throw new HttpError.Forbidden('Invalid access token');
 
     req.user = { id: payload.userId as string };
     next();

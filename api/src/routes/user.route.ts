@@ -21,7 +21,7 @@ userRouter.patch(
   validate(schema.user),
   authenticate,
   checkBan,
-  userController.setBan(true),
+  userController.ban,
 );
 
 userRouter.patch(
@@ -29,5 +29,5 @@ userRouter.patch(
   validate(schema.user),
   authenticate,
   checkBan,
-  userController.setBan(false),
+  userController.unban,
 );
