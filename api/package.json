@@ -11,9 +11,7 @@
   "scripts": {
     "build": "rimraf dist && esbuild src/app.ts --bundle --platform=node --outfile=dist/index.cjs --format=cjs",
     "format": "prettier --check .",
-    "format:staged": "prettier --write",
     "lint": "eslint --cache src",
-    "lint:staged": "eslint --fix",
     "serve": "node dist/index.cjs",
     "start": "tsx --watch src/app.ts",
     "typecheck": "tsc"
