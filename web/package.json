@@ -1,0 +1,44 @@
+{
+  "name": "web",
+  "private": true,
+  "description": "Front-end for auth-app",
+  "homepage": "https://github.com/alex-kim-dev/auth-app#readme",
+  "bugs": "https://github.com/alex-kim-dev/auth-app/issues",
+  "repository": "git@github.com:alex-kim-dev/auth-app.git",
+  "license": "MIT",
+  "author": "Alex Kim (https://github.com/alex-kim-dev)",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "format": "prettier --check .",
+    "lint": "eslint --cache src && stylelint --cache \"src/**/*.css\"",
+    "serve": "vite preview",
+    "start": "vite",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.4.0",
+    "@types/eslint__js": "8.42.3",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react-swc": "3.7.0",
+    "eslint": "9.4.0",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "eslint-plugin-react-refresh": "0.4.6",
+    "prettier": "3.3.1",
+    "prettier-plugin-packagejson": "2.5.0",
+    "stylelint": "16.6.1",
+    "stylelint-config-recess-order": "5.0.1",
+    "stylelint-config-standard": "36.0.0",
+    "stylelint-order": "6.0.4",
+    "typescript": "5.4.5",
+    "typescript-eslint": "7.12.0",
+    "vite": "5.3.1",
+    "vite-plugin-svgr": "4.2.0",
+    "vite-tsconfig-paths": "4.3.2"
+  }
+}
