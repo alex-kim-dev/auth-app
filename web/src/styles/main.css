@@ -43,4 +43,18 @@ body {
 
 /* Containers */
 
+.main {
+  max-inline-size: 430px;
+  min-block-size: 100dvh;
+  padding: 16px;
+  margin-inline: auto;
+}
+
 /* Screen sizes */
+
+@media (width >= 768px) {
+  .main {
+    max-inline-size: 1440px;
+    padding: 40px;
+  }
+}

@@ -5,12 +5,19 @@ import '~/styles/main.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { MainLayout } from '~/views';
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
 
 root.render(
   <StrictMode>
-    <h1>Auth app</h1>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />} path='/' />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 );
