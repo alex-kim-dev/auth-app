@@ -1,0 +1,46 @@
+/* Variables */
+
+:root {
+  --c-primary: #292929;
+  --c-primary-light: #444;
+  --c-secondary: #f8f8f8;
+  --c-secondary-dark: #d7d7d7;
+  --c-muted: #767676;
+  --c-success: #1ba228;
+  --c-danger: #ec0000;
+}
+
+/* Utils */
+
+.hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Base */
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'M PLUS 1p', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--c-primary);
+  overflow-wrap: break-word;
+}
+
+/* Components */
+
+/* Containers */
+
+/* Screen sizes */
