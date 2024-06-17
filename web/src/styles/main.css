@@ -151,6 +151,27 @@ a:visited {
   box-shadow: inset 0 0 0 1px var(--c-primary);
 }
 
+.password {
+  display: grid;
+  grid-template: auto / 1fr auto;
+}
+
+.password__input {
+  grid-area: 1 / 1 / -1 / -1;
+  padding-inline-end: 52px;
+}
+
+.password__btn {
+  grid-area: 1 / 2 / -1 / -1;
+  align-self: center;
+  padding: 8px;
+  margin-inline-end: 1px;
+}
+
+.password__btn:active {
+  translate: 0;
+}
+
 /* Views */
 
 .main {
