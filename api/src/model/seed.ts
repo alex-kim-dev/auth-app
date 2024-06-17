@@ -1,9 +1,11 @@
+import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
+dotenv.config();
 const prisma = new PrismaClient();
 const { TEST_PASSWORD } = process.env;
-const SALT_ROUNDS = 2;
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS || '');
 
 const users: [email: string, name: string, isBanned: boolean][] = [
   ['raccoon@email.com', 'Raccoon', false],
@@ -15,8 +17,8 @@ const users: [email: string, name: string, isBanned: boolean][] = [
 ];
 
 async function main() {
-  if (!TEST_PASSWORD)
-    throw new Error('The test password for the db seeding is not specified');
+  if (!TEST_PASSWORD || !SALT_ROUNDS)
+    throw new Error('Some of the env variables are not specified');
 
   await prisma.user.createMany({
     data: users.map(([email, name, isBanned]) => ({

@@ -1,5 +1,5 @@
 import type { Response, Request } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { randomBytes, createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
