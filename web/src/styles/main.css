@@ -63,7 +63,73 @@ a:visited {
   color: inherit;
 }
 
+@keyframes btn-loading {
+  from {
+    background-position: 100%;
+  }
+
+  to {
+    background-position: 0;
+  }
+}
+
 /* Components */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 50px;
+  padding-block: 13px;
+  padding-inline: 16px;
+  font-weight: 500;
+  color: var(--c-secondary);
+  cursor: pointer;
+  background-color: var(--c-primary);
+  border: 0;
+  border-radius: 12px;
+  transition:
+    translate 100ms ease-out,
+    background-color 100ms ease-out,
+    background-position 300ms;
+}
+
+.btn:disabled {
+  color: var(--c-muted);
+  cursor: not-allowed;
+  background-color: var(--c-secondary-dark);
+}
+
+.btn:enabled:active {
+  translate: 0 2px;
+}
+
+.btn:enabled:hover {
+  background-color: var(--c-primary-light);
+}
+
+.btn--loading:disabled {
+  background: 0% / 250% no-repeat
+    linear-gradient(
+      90deg,
+      var(--c-secondary-dark) 0,
+      var(--c-secondary-dark) 40%,
+      var(--c-secondary) 50%,
+      var(--c-secondary-dark) 60%,
+      var(--c-secondary-dark) 100%
+    );
+  animation: btn-loading 1s infinite;
+}
+
+.btn--alt {
+  color: var(--c-primary);
+  background-color: transparent;
+  background-image: none;
+}
+
+.btn--alt:enabled:hover {
+  background-color: var(--c-secondary-dark);
+}
 
 /* Views */
 
