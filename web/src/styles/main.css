@@ -224,6 +224,8 @@ a:visited {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-block-size: 100vh;
+  margin-inline: auto;
 }
 
 .error__heading {
