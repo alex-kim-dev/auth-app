@@ -11,7 +11,7 @@ export const AuthLayout: React.FC = () => {
           A full-stack web app for authentication and user management
         </p>
       </div>
-      <div>
+      <div className='content'>
         <Outlet />
       </div>
     </>
