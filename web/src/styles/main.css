@@ -28,6 +28,14 @@
   text-align: center;
 }
 
+.success {
+  color: var(--c-success);
+}
+
+.danger {
+  color: var(--c-danger);
+}
+
 /* Base */
 
 html {
@@ -141,6 +149,30 @@ a:visited {
   background-color: var(--c-secondary-dark);
 }
 
+.btn-back {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 0;
+  font-weight: 400;
+  background-color: transparent;
+}
+
+.btn-back::before {
+  display: inline-block;
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  content: '';
+  background:
+    center / 2.4rem no-repeat url('../assets/arrow_left.svg'),
+    var(--c-secondary-dark);
+  border-radius: 50%;
+}
+
+.btn-back:hover {
+  text-decoration: underline;
+}
+
 .input {
   inline-size: 100%;
   padding-block: 14px;
@@ -236,11 +268,17 @@ a:visited {
 }
 
 .content {
+  position: relative;
   display: flex;
   flex-direction: column;
+  gap: 36px;
   align-items: center;
   justify-content: center;
   min-block-size: 100%;
+}
+
+.content__back {
+  align-self: flex-start;
 }
 
 .auth-form {
@@ -264,6 +302,24 @@ a:visited {
   align-items: center;
   justify-content: center;
   min-block-size: 50px;
+}
+
+.auth-form__requirements {
+  padding-inline-start: 10px;
+  margin-block: 6px 0;
+  font-size: 1.3rem;
+  line-height: 1.67;
+  color: var(--c-muted);
+}
+
+.auth-form__requirement.success::after {
+  font-size: 0.8em;
+  content: ' ✅';
+}
+
+.auth-form__requirement.danger::after {
+  font-size: 0.8em;
+  content: ' ❌';
 }
 
 /* Screen sizes */
@@ -300,6 +356,12 @@ a:visited {
 
   .hero__caption {
     font-size: 2.8rem;
+  }
+
+  .content__back {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
   }
 
   .auth-form {
