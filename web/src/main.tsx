@@ -7,35 +7,23 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import {
-  MainLayout,
-  AuthLayout,
-  ErrorPage,
-  LoginPage,
-  SignupPage,
-} from '~/views';
+import { AuthLayout, ErrorPage, LoginPage, SignupPage } from '~/views';
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <MainLayout />,
+    element: <AuthLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <AuthLayout />,
-        children: [
-          {
-            path: '/',
-            element: <LoginPage />,
-          },
-          {
-            path: '/signup',
-            element: <SignupPage />,
-          },
-        ],
+        path: '/',
+        element: <LoginPage />,
+      },
+      {
+        path: '/signup',
+        element: <SignupPage />,
       },
     ],
   },

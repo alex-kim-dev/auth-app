@@ -3,7 +3,7 @@ import Illustration from '~/assets/illustration.svg?react';
 
 export const AuthLayout: React.FC = () => {
   return (
-    <>
+    <main className='layout layout--auth'>
       <div className='hero text-center'>
         <Illustration className='hero__pic' />
         <h1 className='hero__heading'>Auth app</h1>
@@ -14,6 +14,6 @@ export const AuthLayout: React.FC = () => {
       <div className='content'>
         <Outlet />
       </div>
-    </>
+    </main>
   );
 };
