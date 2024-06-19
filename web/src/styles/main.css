@@ -96,6 +96,7 @@ a:visited {
 
 .btn {
   display: flex;
+  gap: 4px;
   align-items: center;
   justify-content: center;
   min-block-size: 50px;
@@ -212,8 +213,7 @@ a:visited {
 .layout {
   max-inline-size: 430px;
   min-block-size: 100vh;
-  padding-block: 32px;
-  padding-inline: 16px;
+  padding: 16px;
   margin-inline: auto;
 }
 
@@ -327,6 +327,31 @@ a:visited {
   content: ' ❌';
 }
 
+.app-bar {
+  background-color: var(--c-secondary);
+}
+
+.app-bar__container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  inline-size: 100%;
+  max-inline-size: 430px;
+  padding: 16px;
+  margin-inline: auto;
+}
+
+.app-bar__brand {
+  flex-grow: 1;
+  flex-shrink: 0;
+  font-size: 2.4rem;
+}
+
+.app-bar__greeting {
+  line-height: 1.2;
+  text-align: right;
+}
+
 /* Screen sizes */
 
 @media (width >= 768px) {
@@ -378,5 +403,10 @@ a:visited {
 
   .auth-form__heading {
     font-size: 3.2rem;
+  }
+
+  .app-bar__container {
+    max-inline-size: 1440px;
+    padding-inline: 36px;
   }
 }
