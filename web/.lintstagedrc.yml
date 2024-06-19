@@ -4,5 +4,5 @@
 '*.css':
   - stylelint --fix
 
-'*.{js,ts,css,html,json,yml,md}':
+'*.{js,ts,jsx,tsx,css,html,json,yml,md}':
   - prettier --write
