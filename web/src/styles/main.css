@@ -48,6 +48,7 @@ body {
   font-weight: 500;
   color: var(--c-primary);
   overflow-wrap: break-word;
+  accent-color: var(--c-primary);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -208,6 +209,22 @@ a:visited {
   translate: 0;
 }
 
+.checkbox {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+.heading {
+  margin-block-end: 16px;
+  font-size: 2.8rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-block-end: 16px;
+}
+
 /* Views */
 
 .layout {
@@ -349,12 +366,52 @@ a:visited {
 
 .app-bar__greeting {
   line-height: 1.2;
-  text-align: right;
+  text-align: end;
+}
+
+.table-wrapper {
+  inline-size: 100vw;
+  margin-inline: calc(50% - 50vw);
+  overflow-x: scroll;
+}
+
+.table {
+  inline-size: 100%;
+  vertical-align: top;
+  border-collapse: collapse;
+}
+
+.table__head {
+  vertical-align: bottom;
+}
+
+.table__row {
+  text-align: start;
+  transition: background-color 250ms;
+}
+
+.table__row:hover {
+  background-color: var(--c-secondary);
+}
+
+.table__header {
+  text-align: start;
+  overflow-wrap: break-word;
+}
+
+.table__cell {
+  padding: 8px;
+  border-block-end: 2px solid var(--c-secondary-dark);
 }
 
 /* Screen sizes */
 
 @media (width >= 768px) {
+  .heading {
+    margin-block-end: 32px;
+    font-size: 3.2rem;
+  }
+
   .layout {
     max-inline-size: 1440px;
     padding: 36px;
@@ -408,5 +465,10 @@ a:visited {
   .app-bar__container {
     max-inline-size: 1440px;
     padding-inline: 36px;
+  }
+
+  .table-wrapper {
+    inline-size: 100%;
+    margin-inline: 0;
   }
 }

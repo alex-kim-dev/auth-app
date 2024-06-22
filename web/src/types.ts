@@ -1,0 +1,9 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  lastLogin: string;
+  createdAt: string;
+  isBanned: boolean;
+  selected: boolean;
+}
