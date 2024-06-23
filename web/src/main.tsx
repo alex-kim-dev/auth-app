@@ -15,6 +15,7 @@ import {
   SignupPage,
   UsersPage,
 } from '~/views';
+import { AuthProvider } from './context/auth';
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
@@ -48,6 +49,8 @@ const router = createBrowserRouter([
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

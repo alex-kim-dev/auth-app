@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import cn from 'clsx';
 import { PasswordField } from '~/components/PasswordField';
+import { api } from '~/api';
+import { useAuth } from '~/context/auth';
 
 const schema = z
   .object({
@@ -36,6 +38,7 @@ const check = (result: ValidateResult | undefined, message: string) => {
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
   const {
     register,
     handleSubmit,
@@ -49,15 +52,18 @@ export const SignupPage: React.FC = () => {
     document.title = 'Auth app | Sign up';
   });
 
-  const onSubmit: SubmitHandler<RegisterInputs> = async (data) => {
-    console.info('sending request to register', data);
-
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        navigate('/users');
-        resolve();
-      }, 1500);
-    });
+  const onSubmit: SubmitHandler<RegisterInputs> = async ({
+    email,
+    name,
+    password,
+  }) => {
+    try {
+      const { data } = await api.auth.signup({ email, name, password });
+      setAuth(data);
+      navigate('/users');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const pwErrTypes = errors.password?.types;
