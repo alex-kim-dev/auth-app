@@ -225,6 +225,30 @@ a:visited {
   margin-block-end: 16px;
 }
 
+.toast {
+  min-block-size: 0;
+  padding: 0;
+  margin-bottom: 10px;
+  font: inherit;
+  color: var(--c-primary);
+  background-color: var(--c-secondary);
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.toast__container {
+  top: 0;
+  padding: 16px;
+}
+
+.toast__body {
+  padding-block: 14px;
+  padding-inline: 16px;
+  margin: 0;
+}
+
 /* Views */
 
 .layout {

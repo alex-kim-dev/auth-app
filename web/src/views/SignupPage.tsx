@@ -4,6 +4,7 @@ import { SubmitHandler, useForm, type ValidateResult } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import cn from 'clsx';
+import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
 import { api } from '~/api';
 import { useAuth } from '~/context/auth';
@@ -57,13 +58,16 @@ export const SignupPage: React.FC = () => {
     name,
     password,
   }) => {
-    try {
-      const { data } = await api.auth.signup({ email, name, password });
+    const { data, errorMsg } = await api.auth.signup({
+      email,
+      name,
+      password,
+    });
+
+    if (data) {
       setAuth(data);
       navigate('/users');
-    } catch (error) {
-      console.error(error);
-    }
+    } else toast.error(errorMsg);
   };
 
   const pwErrTypes = errors.password?.types;
