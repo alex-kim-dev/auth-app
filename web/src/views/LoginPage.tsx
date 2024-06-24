@@ -2,7 +2,10 @@ import { useLayoutEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import cn from 'clsx';
+import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
+import { useAuth } from '~/context/auth';
+import { api } from '~/api';
 
 interface LoginInputs {
   email: string;
@@ -11,6 +14,7 @@ interface LoginInputs {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
   const {
     register,
     handleSubmit,
@@ -24,13 +28,12 @@ export const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     if (email.length === 0 || password.length === 0) return;
 
-    console.info('sending a request to login', { email, password });
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        navigate('/users');
-        resolve();
-      }, 1500);
-    });
+    const { data, errorMsg } = await api.auth.login({ email, password });
+
+    if (data) {
+      setAuth(data);
+      navigate('/users');
+    } else toast.error(errorMsg);
   };
 
   return (
