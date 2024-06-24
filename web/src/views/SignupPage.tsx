@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
 import { api } from '~/api';
 import { useAuth } from '~/context/auth';
+import { isAxiosError } from 'axios';
 
 const schema = z
   .object({
@@ -58,16 +59,17 @@ export const SignupPage: React.FC = () => {
     name,
     password,
   }) => {
-    const { data, errorMsg } = await api.auth.signup({
-      email,
-      name,
-      password,
-    });
+    try {
+      const { data } = await api.auth.signup({ email, name, password });
 
-    if (data) {
       setAuth(data);
       navigate('/users');
-    } else toast.error(errorMsg);
+    } catch (error) {
+      if (isAxiosError<{ message: string }>(error))
+        toast.error(
+          error.response?.data.message ?? 'Unexpected error, try again later',
+        );
+    }
   };
 
   const pwErrTypes = errors.password?.types;

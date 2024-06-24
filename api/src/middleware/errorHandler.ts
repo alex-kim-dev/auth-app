@@ -10,5 +10,7 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     return res.status(statusCode).send({ message });
   }
 
-  return res.status(500).send({ message: 'Internal server error' });
+  return res.status(500).send({
+    message: 'There was a problem on the server side, try again later',
+  });
 };

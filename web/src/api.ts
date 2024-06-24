@@ -1,4 +1,4 @@
-import axiosLib, { AxiosError, isAxiosError } from 'axios';
+import axiosLib from 'axios';
 
 const axios = axiosLib.create({
   baseURL: import.meta.env.VITE_API_URL as string,
@@ -25,56 +25,22 @@ interface LoginResponse {
 const controllers: Partial<Record<keyof typeof auth, AbortController>> = {};
 
 const auth = {
-  async signup(data: SignupData) {
+  signup(data: SignupData) {
     const controller = new AbortController();
     controllers.signup = controller;
 
-    try {
-      const res = await axios.post<LoginResponse>('/auth/signup', data, {
-        signal: controller.signal,
-      });
-
-      return { data: res.data, errorMsg: null };
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const errorMsg =
-          {
-            400: 'Incorrect sign up data',
-            409: (error as AxiosError<{ message: string }>).response?.data
-              .message,
-            500: 'There was a problem on the server side, try again later',
-          }[String(error.response?.status)] || 'Unrecognized error';
-
-        return { data: null, errorMsg };
-      } else throw error;
-    }
+    return axios.post<LoginResponse>('/auth/signup', data, {
+      signal: controller.signal,
+    });
   },
 
-  async login(data: LoginData) {
+  login(data: LoginData) {
     const controller = new AbortController();
     controllers.signup = controller;
 
-    try {
-      const res = await axios.post<LoginResponse>('/auth/login', data, {
-        signal: controller.signal,
-      });
-
-      return { data: res.data, errorMsg: null };
-    } catch (error) {
-      if (isAxiosError(error)) {
-        const errorMsg =
-          {
-            400: 'Incorrect login data',
-            401: (error as AxiosError<{ message: string }>).response?.data
-              .message,
-            403: (error as AxiosError<{ message: string }>).response?.data
-              .message,
-            500: 'There was a problem on the server side, try again later',
-          }[String(error.response?.status)] || 'Unrecognized error';
-
-        return { data: null, errorMsg };
-      } else throw error;
-    }
+    return axios.post<LoginResponse>('/auth/login', data, {
+      signal: controller.signal,
+    });
   },
 };
 

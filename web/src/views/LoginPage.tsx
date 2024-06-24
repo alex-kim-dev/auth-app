@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
 import { useAuth } from '~/context/auth';
 import { api } from '~/api';
+import { isAxiosError } from 'axios';
 
 interface LoginInputs {
   email: string;
@@ -28,12 +29,17 @@ export const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     if (email.length === 0 || password.length === 0) return;
 
-    const { data, errorMsg } = await api.auth.login({ email, password });
+    try {
+      const { data } = await api.auth.login({ email, password });
 
-    if (data) {
       setAuth(data);
       navigate('/users');
-    } else toast.error(errorMsg);
+    } catch (error) {
+      if (isAxiosError<{ message: string }>(error))
+        toast.error(
+          error.response?.data.message ?? 'Unexpected error, try again later',
+        );
+    }
   };
 
   return (
