@@ -31,6 +31,7 @@ const auth = {
 
     return axios.post<LoginResponse>('/auth/signup', data, {
       signal: controller.signal,
+      withCredentials: true,
     });
   },
 
@@ -40,6 +41,7 @@ const auth = {
 
     return axios.post<LoginResponse>('/auth/login', data, {
       signal: controller.signal,
+      withCredentials: true,
     });
   },
 };

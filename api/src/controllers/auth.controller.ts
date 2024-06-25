@@ -29,8 +29,8 @@ const createTokens = (userId: string) => {
 const setRefreshTokenCookie = (res: Response, token: string) => {
   res.cookie('refreshToken', token, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     maxAge: ms(env.RT_EXPIRATION),
     path: '/auth/refresh',
   });
