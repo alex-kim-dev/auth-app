@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import cn from 'clsx';
 import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
-import { useAuth } from '~/context/auth';
+import { useGlobalState } from '~/store';
 import { api } from '~/api';
 import { isAxiosError } from 'axios';
 
@@ -15,7 +15,7 @@ interface LoginInputs {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { setAuth } = useGlobalState();
   const {
     register,
     handleSubmit,

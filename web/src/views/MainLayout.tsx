@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import { BoxArrowRight } from 'react-bootstrap-icons';
 import { useMediaQuery } from '@uidotdev/usehooks';
-import { useAuth } from '~/context/auth';
+import { useGlobalState } from '~/store';
 
 export const MainLayout: React.FC = () => {
   const isSmallScreen = useMediaQuery('(width < 768px');
-  const { auth } = useAuth();
+  const { auth } = useGlobalState();
   const name = auth?.name ?? 'Anonymous';
 
   return (

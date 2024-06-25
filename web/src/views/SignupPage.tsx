@@ -7,7 +7,7 @@ import cn from 'clsx';
 import { toast } from 'react-toastify';
 import { PasswordField } from '~/components/PasswordField';
 import { api } from '~/api';
-import { useAuth } from '~/context/auth';
+import { useGlobalState } from '~/store';
 import { isAxiosError } from 'axios';
 
 const schema = z
@@ -40,7 +40,7 @@ const check = (result: ValidateResult | undefined, message: string) => {
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const { setAuth } = useGlobalState();
   const {
     register,
     handleSubmit,

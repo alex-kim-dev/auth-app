@@ -8,7 +8,6 @@ import {
   SignupPage,
   UsersPage,
 } from '~/views';
-import { AuthProvider } from './context/auth';
 
 const router = createBrowserRouter([
   {
@@ -39,7 +38,7 @@ const router = createBrowserRouter([
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
+    <>
       <ToastContainer
         bodyClassName='toast__body'
         className='toast__container'
@@ -56,6 +55,6 @@ export const App: React.FC = () => {
         pauseOnHover
       />
       <RouterProvider router={router} />
-    </AuthProvider>
+    </>
   );
 };
