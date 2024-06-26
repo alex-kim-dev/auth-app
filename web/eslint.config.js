@@ -22,6 +22,7 @@ export default tseslint.config(
           checksVoidReturn: false,
         },
       ],
+      '@typescript-eslint/prefer-promise-reject-errors': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
     },
   },

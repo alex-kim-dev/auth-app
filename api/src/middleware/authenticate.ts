@@ -15,7 +15,7 @@ export const authenticate = (
 
   jwt.verify(accessToken, env.AT_SECRET, (error, payload) => {
     if (error || !payload || typeof payload === 'string')
-      throw new HttpError.Forbidden('Invalid access token');
+      throw new HttpError.Unauthorized('Invalid access token');
 
     req.user = { id: payload.userId as string };
     next();

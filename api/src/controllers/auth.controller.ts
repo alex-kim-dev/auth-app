@@ -128,11 +128,11 @@ const refresh = async (req: Request, res: Response) => {
   });
 
   if (record?.user.isBanned) throw new HttpError.Forbidden('User is banned');
-  if (!record) throw new HttpError.Forbidden('Access forbidden');
+  if (!record) throw new HttpError.Forbidden('Invalid refresh token');
 
   if (record.expiresAt <= new Date()) {
     await prisma.refreshToken.delete({ where: { hash } });
-    res.status(403).send({ message: 'Access forbidden' });
+    throw new HttpError.Forbidden('Invalid refresh token');
   }
 
   const { user } = record;
