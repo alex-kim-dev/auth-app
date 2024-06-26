@@ -1,42 +1,15 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import {
-  MainLayout,
-  AuthLayout,
-  ErrorPage,
-  LoginPage,
-  SignupPage,
-  UsersPage,
-} from '~/views';
-
-const router = createBrowserRouter([
-  {
-    element: <AuthLayout />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: '/',
-        element: <LoginPage />,
-      },
-      {
-        path: '/signup',
-        element: <SignupPage />,
-      },
-    ],
-  },
-  {
-    element: <MainLayout />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: '/users',
-        element: <UsersPage />,
-      },
-    ],
-  },
-]);
+import { setNavigator } from '~/helpers';
 
 export const App: React.FC = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigator(navigate);
+  }, [navigate]);
+
   return (
     <>
       <ToastContainer
@@ -54,7 +27,7 @@ export const App: React.FC = () => {
         pauseOnFocusLoss
         pauseOnHover
       />
-      <RouterProvider router={router} />
+      <Outlet />
     </>
   );
 };
