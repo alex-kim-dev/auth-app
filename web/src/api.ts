@@ -99,6 +99,14 @@ const auth = {
       withCredentials: true,
     });
   },
+
+  logout() {
+    controllers.logout = new AbortController();
+    return axiosPrivate.get('/auth/logout', {
+      signal: controllers.logout.signal,
+      withCredentials: true,
+    });
+  },
 };
 
 export const api = { controllers, auth };
