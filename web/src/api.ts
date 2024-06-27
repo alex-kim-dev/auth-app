@@ -1,11 +1,15 @@
-import axiosLib, { AxiosError, isAxiosError } from 'axios';
+import axios, { AxiosError, isAxiosError } from 'axios';
+import { toast } from 'react-toastify';
 import { useGlobalState } from '~/store';
 import { navigateTo } from '~/helpers';
 
-const axios = axiosLib.create({
+const axiosPublic = axios.create({
   baseURL: import.meta.env.VITE_API_URL as string,
   timeout: 120_000,
 });
+
+/** has interceptors to send and refresh the access token */
+const axiosPrivate = axios.create(axiosPublic.defaults);
 
 interface SignupData {
   email: string;
@@ -24,7 +28,7 @@ interface LoginResponse {
   accessToken: string;
 }
 
-axios.interceptors.request.use(
+axiosPrivate.interceptors.request.use(
   (config) => {
     const { auth } = useGlobalState.getState();
     if (auth?.accessToken)
@@ -35,29 +39,36 @@ axios.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error),
 );
 
-axios.interceptors.response.use(
+axiosPrivate.interceptors.response.use(
   (res) => res,
 
   async (error: AxiosError) => {
-    const { response } = error;
-    if (response?.status !== 401) {
-      return Promise.reject(error);
-    }
-    if (response.config.url?.endsWith('/auth/refresh')) {
-      return Promise.reject(error);
+    const { response: res, config } = error;
+
+    if (res?.status === 401) {
+      try {
+        const { data } = await api.auth.refresh();
+        useGlobalState.setState({ auth: data });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return axiosPrivate(config!);
+      } catch (error) {
+        if (
+          isAxiosError(error) &&
+          [400, 403].includes(error.response?.status ?? NaN)
+        ) {
+          useGlobalState.setState({ auth: null });
+          navigateTo('/');
+          if (error.response?.status === 403) toast.error('Access denied');
+          return Promise.resolve();
+        }
+        return Promise.reject(error);
+      }
     }
 
-    try {
-      const { data } = await api.auth.refresh();
-      useGlobalState.setState({ auth: data });
-    } catch (error) {
-      if (
-        isAxiosError(error) &&
-        [400, 403].includes(error.response?.status ?? NaN)
-      ) {
-        useGlobalState.setState({ auth: null });
-        navigateTo('/');
-      } else return Promise.reject(error);
+    if (res?.status === 403) {
+      useGlobalState.setState({ auth: null });
+      navigateTo('/');
+      toast.error('Access denied');
     }
   },
 );
@@ -66,31 +77,25 @@ const controllers: Partial<Record<keyof typeof auth, AbortController>> = {};
 
 const auth = {
   signup(data: SignupData) {
-    const controller = new AbortController();
-    controllers.signup = controller;
-
-    return axios.post<LoginResponse>('/auth/signup', data, {
-      signal: controller.signal,
+    controllers.signup = new AbortController();
+    return axiosPublic.post<LoginResponse>('/auth/signup', data, {
+      signal: controllers.signup.signal,
       withCredentials: true,
     });
   },
 
   login(data: LoginData) {
-    const controller = new AbortController();
-    controllers.signup = controller;
-
-    return axios.post<LoginResponse>('/auth/login', data, {
-      signal: controller.signal,
+    controllers.login = new AbortController();
+    return axiosPublic.post<LoginResponse>('/auth/login', data, {
+      signal: controllers.login.signal,
       withCredentials: true,
     });
   },
 
   refresh() {
-    const controller = new AbortController();
-    controllers.refresh = controller;
-
-    return axios.get<LoginResponse>('/auth/refresh', {
-      signal: controller.signal,
+    controllers.refresh = new AbortController();
+    return axiosPublic.get<LoginResponse>(`/auth/refresh`, {
+      signal: controllers.refresh.signal,
       withCredentials: true,
     });
   },
