@@ -15,6 +15,7 @@ const getAll = async (req: Request, res: Response) => {
       createdAt: true,
       isBanned: true,
     },
+    orderBy: { name: 'asc' },
   });
 
   res.status(200).send(users);
