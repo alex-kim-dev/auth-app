@@ -1,5 +1,10 @@
 import { CanceledError, isAxiosError } from 'axios';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import {
+  type MouseEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
 import { toast } from 'react-toastify';
 import { api } from '~/api';
@@ -10,7 +15,7 @@ export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchUsers = () => {
     setLoading(true);
 
     api.user
@@ -27,21 +32,60 @@ export const UsersPage: React.FC = () => {
           );
         setLoading(false);
       });
-
-    return () => {
-      api.controllers.getAll?.abort();
-    };
-  }, []);
+  };
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Users';
   });
 
+  useEffect(() => {
+    fetchUsers();
+    return () => {
+      api.controllers.getAll?.abort();
+    };
+  }, []);
+
+  const handleBan: MouseEventHandler = async () => {
+    const selected = users
+      .filter((user) => user.selected)
+      .filter((user) => !user.isBanned);
+
+    if (selected.length === 0) return;
+
+    try {
+      await Promise.all(selected.map((user) => api.user.ban(user.id)));
+      fetchUsers();
+    } catch (error) {
+      if (isAxiosError<{ message: string }>(error))
+        toast.error(
+          error.response?.data.message ?? 'Unexpected error, try again later',
+        );
+    }
+  };
+
+  const handleUnban: MouseEventHandler = async () => {
+    const selected = users
+      .filter((user) => user.selected)
+      .filter((user) => user.isBanned);
+
+    if (selected.length === 0) return;
+
+    try {
+      await Promise.all(selected.map((user) => api.user.unban(user.id)));
+      fetchUsers();
+    } catch (error) {
+      if (isAxiosError<{ message: string }>(error))
+        toast.error(
+          error.response?.data.message ?? 'Unexpected error, try again later',
+        );
+    }
+  };
+
   return (
     <>
       <h1 className='heading text-center'>Table of users</h1>
       <div aria-label='Users table toolbar' className='toolbar' role='toolbar'>
-        <button type='button' className='btn'>
+        <button type='button' className='btn' onClick={handleBan}>
           <LockFill size={18} />
           Block
         </button>
@@ -49,7 +93,8 @@ export const UsersPage: React.FC = () => {
           type='button'
           className='btn'
           aria-label='unblock'
-          title='unblock'>
+          title='unblock'
+          onClick={handleUnban}>
           <UnlockFill size={18} />
         </button>
         <button

@@ -119,6 +119,20 @@ const user = {
       signal: controllers.getAll.signal,
     });
   },
+
+  ban(id: string) {
+    controllers.ban = new AbortController();
+    return axiosPrivate.patch<{ message: string }>(`/user/${id}/ban`, {
+      signal: controllers.ban.signal,
+    });
+  },
+
+  unban(id: string) {
+    controllers.unban = new AbortController();
+    return axiosPrivate.patch<{ message: string }>(`/user/${id}/unban`, {
+      signal: controllers.unban.signal,
+    });
+  },
 };
 
 export const api = { controllers, auth, user };
