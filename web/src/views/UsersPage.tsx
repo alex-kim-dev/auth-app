@@ -1,31 +1,37 @@
-import { useLayoutEffect, useState } from 'react';
+import { CanceledError, isAxiosError } from 'axios';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
-import { UsersTable } from '~/components/UsersTable';
+import { toast } from 'react-toastify';
+import { api } from '~/api';
+import { UsersTable, Spinner } from '~/components';
 import type { User } from '~/types';
 
-const initialUsers: User[] = [
-  {
-    id: 'clxlljv9f0000ffnaro29l4sj',
-    name: 'Alex',
-    email: 'alex@email.com',
-    lastLogin: '2024-06-19T16:23:00.047Z',
-    createdAt: '2024-06-19T08:54:11.713Z',
-    isBanned: false,
-    selected: false,
-  },
-  {
-    id: 'clxm2ezfw000011c32yxkss79',
-    name: 'Raccoon',
-    email: 'raccoon@email.com',
-    lastLogin: '2024-06-19T16:46:17.325Z',
-    createdAt: '2024-06-19T16:46:17.325Z',
-    isBanned: false,
-    selected: false,
-  },
-];
-
 export const UsersPage: React.FC = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    api.user
+      .getAll()
+      .then(({ data }) => {
+        setUsers(data.map((user) => ({ ...user, selected: false })));
+        setLoading(false);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof CanceledError) return;
+        if (isAxiosError<{ message: string }>(error))
+          toast.error(
+            error.response?.data.message ?? 'Unexpected error, try again later',
+          );
+        setLoading(false);
+      });
+
+    return () => {
+      api.controllers.getAll?.abort();
+    };
+  }, []);
 
   useLayoutEffect(() => {
     document.title = 'Auth app | Users';
@@ -53,6 +59,7 @@ export const UsersPage: React.FC = () => {
           title='delete'>
           <TrashFill size={18} />
         </button>
+        {isLoading && <Spinner />}
       </div>
       <div className='table-wrapper'>
         <UsersTable users={users} setUsers={setUsers} />

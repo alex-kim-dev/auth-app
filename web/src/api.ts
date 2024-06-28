@@ -1,6 +1,7 @@
 import axios, { AxiosError, isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useGlobalState } from '~/store';
+import type { User } from '~/types';
 import { navigateTo } from '~/helpers';
 
 const axiosPublic = axios.create({
@@ -73,7 +74,9 @@ axiosPrivate.interceptors.response.use(
   },
 );
 
-const controllers: Partial<Record<keyof typeof auth, AbortController>> = {};
+const controllers: Partial<
+  Record<keyof typeof auth | keyof typeof user, AbortController>
+> = {};
 
 const auth = {
   signup(data: SignupData) {
@@ -109,4 +112,13 @@ const auth = {
   },
 };
 
-export const api = { controllers, auth };
+const user = {
+  getAll() {
+    controllers.getAll = new AbortController();
+    return axiosPrivate.get<Omit<User, 'selected'>[]>('/user/all', {
+      signal: controllers.getAll.signal,
+    });
+  },
+};
+
+export const api = { controllers, auth, user };

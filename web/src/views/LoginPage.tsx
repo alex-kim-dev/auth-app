@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import cn from 'clsx';
 import { toast } from 'react-toastify';
-import { PasswordField } from '~/components/PasswordField';
+import { PasswordField } from '~/components';
 import { useGlobalState } from '~/store';
 import { api } from '~/api';
 import { isAxiosError } from 'axios';

@@ -6,6 +6,8 @@ import {
 } from 'react';
 import type { User } from '~/types';
 
+const formatDate = (date: string) => new Date(date).toLocaleString();
+
 interface UsersTableProps {
   users: User[];
   setUsers: Dispatch<SetStateAction<User[]>>;
@@ -86,8 +88,8 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
             </th>
             <td className='table__cell'>{user.name}</td>
             <td className='table__cell'>{user.email}</td>
-            <td className='table__cell'>{user.lastLogin}</td>
-            <td className='table__cell'>{user.createdAt}</td>
+            <td className='table__cell'>{formatDate(user.lastLogin)}</td>
+            <td className='table__cell'>{formatDate(user.createdAt)}</td>
             <td className='table__cell'>
               {user.isBanned ? 'blocked' : 'active'}
             </td>

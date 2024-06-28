@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useGlobalState } from '~/store';
-import { LogoutModal } from '~/components/LogoutModal';
+import { LogoutModal } from '~/components';
 
 export const MainLayout: React.FC = () => {
   const { auth } = useGlobalState();

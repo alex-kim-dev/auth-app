@@ -93,6 +93,17 @@ a:visited {
   }
 }
 
+@keyframes scaleout {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
 /* Components */
 
 .btn {
@@ -222,6 +233,7 @@ a:visited {
 .toolbar {
   display: flex;
   gap: 8px;
+  align-items: center;
   margin-block-end: 16px;
 }
 
@@ -253,6 +265,14 @@ a:visited {
   position: fixed;
   inset: 0;
   background-color: rgb(0 0 0 / 50%);
+}
+
+.ripple {
+  inline-size: 40px;
+  block-size: 40px;
+  background-color: var(--c-primary-light);
+  border-radius: 100%;
+  animation: scaleout 0.8s infinite ease-in-out;
 }
 
 /* Views */
@@ -402,7 +422,7 @@ a:visited {
 .table-wrapper {
   inline-size: 100vw;
   margin-inline: calc(50% - 50vw);
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .table {

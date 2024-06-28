@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import cn from 'clsx';
 import { toast } from 'react-toastify';
-import { PasswordField } from '~/components/PasswordField';
+import { PasswordField } from '~/components';
 import { api } from '~/api';
 import { useGlobalState } from '~/store';
 import { isAxiosError } from 'axios';
