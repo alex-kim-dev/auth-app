@@ -133,6 +133,13 @@ const user = {
       signal: controllers.unban.signal,
     });
   },
+
+  delete(id: string) {
+    controllers.delete = new AbortController();
+    return axiosPrivate.delete<{ message: string }>(`/user/${id}`, {
+      signal: controllers.delete.signal,
+    });
+  },
 };
 
 export const api = { controllers, auth, user };

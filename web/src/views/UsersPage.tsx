@@ -81,6 +81,22 @@ export const UsersPage: React.FC = () => {
     }
   };
 
+  const handleDelete: MouseEventHandler = async () => {
+    const selected = users.filter((user) => user.selected);
+
+    if (selected.length === 0) return;
+
+    try {
+      await Promise.all(selected.map((user) => api.user.delete(user.id)));
+      fetchUsers();
+    } catch (error) {
+      if (isAxiosError<{ message: string }>(error))
+        toast.error(
+          error.response?.data.message ?? 'Unexpected error, try again later',
+        );
+    }
+  };
+
   return (
     <>
       <h1 className='heading text-center'>Table of users</h1>
@@ -101,7 +117,8 @@ export const UsersPage: React.FC = () => {
           type='button'
           className='btn'
           aria-label='delete'
-          title='delete'>
+          title='delete'
+          onClick={handleDelete}>
           <TrashFill size={18} />
         </button>
         {isLoading && <Spinner />}
