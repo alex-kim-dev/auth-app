@@ -1,4 +1,4 @@
-import type { Response, Request } from 'express';
+import type { Response, Request, CookieOptions } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes, createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
@@ -26,14 +26,12 @@ const createTokens = (userId: string) => {
   };
 };
 
-const setRefreshTokenCookie = (res: Response, token: string) => {
-  res.cookie('refreshToken', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: ms(env.RT_EXPIRATION),
-    path: '/auth/refresh',
-  });
+const refreshTokenCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  maxAge: ms(env.RT_EXPIRATION),
+  path: '/auth/refresh',
 };
 
 const signup = async (
@@ -65,8 +63,10 @@ const signup = async (
     },
   });
 
-  setRefreshTokenCookie(res, tokens.refresh.value);
-  res.status(201).send({ ...user, accessToken: tokens.access.value });
+  res
+    .cookie('refreshToken', tokens.refresh.value, refreshTokenCookieOptions)
+    .status(201)
+    .send({ ...user, accessToken: tokens.access.value });
 };
 
 const login = async (
@@ -107,12 +107,13 @@ const login = async (
     where: { id: user.id },
   });
 
-  setRefreshTokenCookie(res, tokens.refresh.value);
-  res.send({
-    id: user.id,
-    name: user.name,
-    accessToken: tokens.access.value,
-  });
+  res
+    .cookie('refreshToken', tokens.refresh.value, refreshTokenCookieOptions)
+    .send({
+      id: user.id,
+      name: user.name,
+      accessToken: tokens.access.value,
+    });
 };
 
 const refresh = async (req: Request, res: Response) => {
@@ -128,10 +129,10 @@ const refresh = async (req: Request, res: Response) => {
   });
 
   if (record?.user.isBanned) throw new HttpError.Forbidden('User is banned');
-  if (!record) throw new HttpError.Forbidden('Invalid refresh token');
 
-  if (record.expiresAt <= new Date()) {
-    await prisma.refreshToken.delete({ where: { hash } });
+  if (!record || record.expiresAt <= new Date()) {
+    if (record) await prisma.refreshToken.delete({ where: { hash } });
+    res.clearCookie('refreshToken', refreshTokenCookieOptions);
     throw new HttpError.Forbidden('Invalid refresh token');
   }
 
@@ -143,12 +144,13 @@ const refresh = async (req: Request, res: Response) => {
     where: { userId: user.id },
   });
 
-  setRefreshTokenCookie(res, tokens.refresh.value);
-  res.send({
-    id: user.id,
-    name: user.name,
-    accessToken: tokens.access.value,
-  });
+  res
+    .cookie('refreshToken', tokens.refresh.value, refreshTokenCookieOptions)
+    .send({
+      id: user.id,
+      name: user.name,
+      accessToken: tokens.access.value,
+    });
 };
 
 const logout = async (req: Request, res: Response) => {
@@ -158,7 +160,7 @@ const logout = async (req: Request, res: Response) => {
 
   await prisma.refreshToken.delete({ where: { userId: user.id } });
 
-  res.sendStatus(204);
+  res.clearCookie('refreshToken', refreshTokenCookieOptions).sendStatus(204);
 };
 
 export const authController = {
