@@ -12,7 +12,7 @@ export const checkBan = asyncHandler(
       where: { id: req.user.id },
     });
 
-    if (!user) throw new HttpError.NotFound('User not found');
+    if (!user) throw new HttpError.Unauthorized('User not found');
     if (user.isBanned) throw new HttpError.Forbidden('User is banned');
 
     next();
