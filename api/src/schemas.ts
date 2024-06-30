@@ -21,10 +21,14 @@ export const schema = {
         .min(1, 'Name must be at least 1 character long'),
       password: z
         .string({ required_error: 'Password is required' })
-        .min(6, 'Passworld should be at least 6 characters long')
+        .min(8, 'Password must be at least 8 characters long')
+        .max(30, 'Password must not be longer than 30 characters')
+        .regex(/[a-z]/, 'Password must contain lowercase english characters')
+        .regex(/[A-Z]/, 'Password must contain uppercase english characters')
+        .regex(/\d/, 'Password must contain numbers')
         .regex(
-          /^[a-z\d!@#$%^&*]+$/i,
-          'Password should contain alphanumeric characters or symbols: !@#$%^&*',
+          /[!@#$%^&*]/,
+          'Password must contain special characters !@#$%^&*',
         ),
     }),
   }),
