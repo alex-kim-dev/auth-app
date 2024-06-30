@@ -1,7 +1,7 @@
 import type { Response, Request } from 'express';
 import HttpError from 'http-errors';
 import asyncHandler from 'express-async-handler';
-import type { UserReqParams } from '~/schemas';
+import type { UserIdsReqBody } from '~/schemas';
 
 const getAll = async (req: Request, res: Response) => {
   if (!req.prisma) throw new Error("Can't access prisma middleware");
@@ -21,38 +21,52 @@ const getAll = async (req: Request, res: Response) => {
   res.status(200).send(users);
 };
 
-const _delete = async (req: Request<UserReqParams>, res: Response) => {
+const _delete = async (
+  req: Request<object, object, UserIdsReqBody>,
+  res: Response,
+) => {
   const { prisma } = req;
-  const { id } = req.params;
+  const ids = req.body;
   if (!prisma) throw new Error("Can't access prisma middleware");
 
-  const user = await prisma.user.findUnique({ where: { id } });
-  if (!user) throw new HttpError.NotFound('User not found');
+  const users = await prisma.user.findMany({ where: { id: { in: ids } } });
+  const foundIds = new Set(users.map(({ id }) => id));
+  const missingIds = ids.filter((id) => !foundIds.has(id));
 
-  await prisma.user.delete({ where: { id: req.params.id } });
+  if (missingIds.length > 0)
+    throw new HttpError.NotFound(
+      `Users not found (${missingIds.length}): ${missingIds.join(', ')}`,
+    );
 
-  res.status(200).send({ message: 'User deleted successfully' });
+  await prisma.user.deleteMany({ where: { id: { in: ids } } });
+
+  res.status(200).send({ message: 'Users deleted successfully' });
 };
 
 const setBan =
-  (ban: boolean) => async (req: Request<UserReqParams>, res: Response) => {
+  (ban: boolean) =>
+  async (req: Request<object, object, UserIdsReqBody>, res: Response) => {
     const { prisma } = req;
-    const { id } = req.params;
+    const ids = req.body;
     if (!prisma) throw new Error("Can't access prisma middleware");
 
-    const user = await prisma.user.findUnique({ where: { id } });
-    if (!user) throw new HttpError.NotFound('User not found');
+    const users = await prisma.user.findMany({ where: { id: { in: ids } } });
+    const foundIds = new Set(users.map(({ id }) => id));
+    const missingIds = ids.filter((id) => !foundIds.has(id));
 
-    if (user.isBanned === ban)
-      throw new HttpError.BadRequest(
-        `User is already ${ban ? '' : 'un'}banned`,
+    if (missingIds.length > 0)
+      throw new HttpError.NotFound(
+        `Users not found (${missingIds.length}): ${missingIds.join(', ')}`,
       );
 
-    await prisma.user.update({ data: { isBanned: ban }, where: { id } });
+    await prisma.user.updateMany({
+      data: { isBanned: ban },
+      where: { id: { in: ids } },
+    });
 
     res
       .status(200)
-      .send({ message: `User ${ban ? '' : 'un'}banned successfully` });
+      .send({ message: `Users ${ban ? '' : 'un'}banned successfully` });
   };
 
 export const userController = {

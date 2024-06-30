@@ -8,25 +8,25 @@ export const userRouter = Router();
 
 userRouter.get('/all', authenticate, checkBan, userController.getAll);
 
-userRouter.delete(
-  '/:id',
-  validate(schema.user),
+userRouter.post(
+  '/delete',
+  validate(schema.usedIds),
   authenticate,
   checkBan,
   userController.delete,
 );
 
 userRouter.patch(
-  '/:id/ban',
-  validate(schema.user),
+  '/ban',
+  validate(schema.usedIds),
   authenticate,
   checkBan,
   userController.ban,
 );
 
 userRouter.patch(
-  '/:id/unban',
-  validate(schema.user),
+  '/unban',
+  validate(schema.usedIds),
   authenticate,
   checkBan,
   userController.unban,

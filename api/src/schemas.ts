@@ -48,14 +48,12 @@ export const schema = {
     }),
   }),
 
-  user: z.object({
-    params: z.object({
-      id: z.string({ required_error: 'User ID is required' }),
-    }),
+  usedIds: z.object({
+    body: z.array(z.string()),
   }),
 };
 
 export type SignupReqBody = z.infer<typeof schema.signup>['body'];
 export type LoginReqBody = z.infer<typeof schema.login>['body'];
 export type RefreshReqCookies = z.infer<typeof schema.refresh>['cookies'];
-export type UserReqParams = z.infer<typeof schema.user>['params'];
+export type UserIdsReqBody = z.infer<typeof schema.usedIds>['body'];

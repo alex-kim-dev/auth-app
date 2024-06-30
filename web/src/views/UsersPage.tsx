@@ -53,7 +53,7 @@ export const UsersPage: React.FC = () => {
     if (selected.length === 0) return;
 
     try {
-      await Promise.all(selected.map((user) => api.user.ban(user.id)));
+      await api.user.ban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
       if (isAxiosError<{ message: string }>(error))
@@ -71,7 +71,7 @@ export const UsersPage: React.FC = () => {
     if (selected.length === 0) return;
 
     try {
-      await Promise.all(selected.map((user) => api.user.unban(user.id)));
+      await api.user.unban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
       if (isAxiosError<{ message: string }>(error))
@@ -87,7 +87,7 @@ export const UsersPage: React.FC = () => {
     if (selected.length === 0) return;
 
     try {
-      await Promise.all(selected.map((user) => api.user.delete(user.id)));
+      await api.user.delete(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
       if (isAxiosError<{ message: string }>(error))

@@ -122,23 +122,23 @@ const user = {
     });
   },
 
-  ban(id: string) {
+  ban(ids: string[]) {
     controllers.ban = new AbortController();
-    return axiosPrivate.patch<{ message: string }>(`/user/${id}/ban`, {
+    return axiosPrivate.patch<{ message: string }>(`/user/ban`, ids, {
       signal: controllers.ban.signal,
     });
   },
 
-  unban(id: string) {
+  unban(ids: string[]) {
     controllers.unban = new AbortController();
-    return axiosPrivate.patch<{ message: string }>(`/user/${id}/unban`, {
+    return axiosPrivate.patch<{ message: string }>(`/user/unban`, ids, {
       signal: controllers.unban.signal,
     });
   },
 
-  delete(id: string) {
+  delete(ids: string[]) {
     controllers.delete = new AbortController();
-    return axiosPrivate.delete<{ message: string }>(`/user/${id}`, {
+    return axiosPrivate.post<{ message: string }>(`/user/delete`, ids, {
       signal: controllers.delete.signal,
     });
   },
