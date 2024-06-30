@@ -71,6 +71,8 @@ axiosPrivate.interceptors.response.use(
       navigateTo('/');
       toast.error('Access denied');
     }
+
+    return Promise.reject(error);
   },
 );
 
