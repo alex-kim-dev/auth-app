@@ -1,6 +1,12 @@
 import axios, { AxiosError, isAxiosError } from 'axios';
 import { useGlobalState } from '~/store';
-import type { User } from '~/types';
+import type {
+  User,
+  LoginData,
+  LoginResponse,
+  MessageResponse,
+  SignupData,
+} from '~/types';
 import { navigateTo } from '~/helpers';
 
 const axiosPublic = axios.create({
@@ -10,23 +16,6 @@ const axiosPublic = axios.create({
 
 /** has interceptors to send and refresh the access token */
 const axiosPrivate = axios.create(axiosPublic.defaults);
-
-interface SignupData {
-  email: string;
-  name: string;
-  password: string;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  id: string;
-  name: string;
-  accessToken: string;
-}
 
 axiosPrivate.interceptors.request.use(
   (config) => {
@@ -117,21 +106,21 @@ const user = {
 
   ban(ids: string[]) {
     controllers.ban = new AbortController();
-    return axiosPrivate.patch<{ message: string }>(`/user/ban`, ids, {
+    return axiosPrivate.patch<MessageResponse>(`/user/ban`, ids, {
       signal: controllers.ban.signal,
     });
   },
 
   unban(ids: string[]) {
     controllers.unban = new AbortController();
-    return axiosPrivate.patch<{ message: string }>(`/user/unban`, ids, {
+    return axiosPrivate.patch<MessageResponse>(`/user/unban`, ids, {
       signal: controllers.unban.signal,
     });
   },
 
   delete(ids: string[]) {
     controllers.delete = new AbortController();
-    return axiosPrivate.post<{ message: string }>(`/user/delete`, ids, {
+    return axiosPrivate.post<MessageResponse>(`/user/delete`, ids, {
       signal: controllers.delete.signal,
     });
   },

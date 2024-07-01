@@ -9,7 +9,7 @@ import { LockFill, TrashFill, UnlockFill } from 'react-bootstrap-icons';
 import { toast } from 'react-toastify';
 import { api } from '~/api';
 import { UsersTable, Spinner } from '~/components';
-import type { User } from '~/types';
+import type { User, MessageResponse } from '~/types';
 
 export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -26,7 +26,7 @@ export const UsersPage: React.FC = () => {
       })
       .catch((error: unknown) => {
         if (error instanceof CanceledError) return;
-        if (isAxiosError<{ message: string }>(error))
+        if (isAxiosError<MessageResponse>(error))
           toast.error(
             error.response?.data.message ?? 'Unexpected error, try again later',
           );
@@ -56,7 +56,7 @@ export const UsersPage: React.FC = () => {
       await api.user.ban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error)) {
+      if (isAxiosError<MessageResponse>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
@@ -76,7 +76,7 @@ export const UsersPage: React.FC = () => {
       await api.user.unban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error)) {
+      if (isAxiosError<MessageResponse>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
@@ -94,7 +94,7 @@ export const UsersPage: React.FC = () => {
       await api.user.delete(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error)) {
+      if (isAxiosError<MessageResponse>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
