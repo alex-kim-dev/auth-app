@@ -56,10 +56,12 @@ export const UsersPage: React.FC = () => {
       await api.user.ban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error))
+      if (isAxiosError<{ message: string }>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
+        if (error.response?.status === 404) fetchUsers();
+      }
     }
   };
 
@@ -74,10 +76,12 @@ export const UsersPage: React.FC = () => {
       await api.user.unban(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error))
+      if (isAxiosError<{ message: string }>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
+        if (error.response?.status === 404) fetchUsers();
+      }
     }
   };
 
@@ -90,10 +94,12 @@ export const UsersPage: React.FC = () => {
       await api.user.delete(selected.map(({ id }) => id));
       fetchUsers();
     } catch (error) {
-      if (isAxiosError<{ message: string }>(error))
+      if (isAxiosError<{ message: string }>(error)) {
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
         );
+        if (error.response?.status === 404) fetchUsers();
+      }
     }
   };
 
