@@ -1,5 +1,4 @@
 import axios, { AxiosError, isAxiosError } from 'axios';
-import { toast } from 'react-toastify';
 import { useGlobalState } from '~/store';
 import type { User } from '~/types';
 import { navigateTo } from '~/helpers';
@@ -53,23 +52,17 @@ axiosPrivate.interceptors.response.use(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return axiosPrivate(config!);
       } catch (error) {
-        if (
-          isAxiosError(error) &&
-          [400, 403].includes(error.response?.status ?? NaN)
-        ) {
+        if (isAxiosError(error) && error.response?.status === 403) {
           useGlobalState.setState({ auth: null });
           navigateTo('/');
-          if (error.response?.status === 403) toast.error('Access denied');
-          return Promise.resolve();
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
       }
     }
 
-    if (res?.status === 403) {
+    if ([401, 403].includes(error.response?.status ?? NaN)) {
       useGlobalState.setState({ auth: null });
       navigateTo('/');
-      toast.error('Access denied');
     }
 
     return Promise.reject(error);
