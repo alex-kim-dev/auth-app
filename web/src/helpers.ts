@@ -9,3 +9,5 @@ export const setNavigator = (navigatorFn: NavigateFunction) => {
 export const navigateTo = (to: To) => {
   if (navigate) navigate(to);
 };
+
+export const formatDate = (date: string) => new Date(date).toLocaleString();

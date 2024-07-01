@@ -4,9 +4,8 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
+import { formatDate } from '~/helpers';
 import type { User } from '~/types';
-
-const formatDate = (date: string) => new Date(date).toLocaleString();
 
 interface UsersTableProps {
   users: User[];
