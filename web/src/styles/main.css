@@ -553,6 +553,10 @@ a:visited {
     padding-inline: 36px;
   }
 
+  .app-bar__greeting {
+    line-height: 50px;
+  }
+
   .table-wrapper {
     inline-size: 100%;
     margin-inline: 0;
