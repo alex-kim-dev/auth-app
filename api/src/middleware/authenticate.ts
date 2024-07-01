@@ -11,11 +11,12 @@ export const authenticate = (
   const authHeader = req.headers.authorization ?? '';
   const accessToken = authHeader.match(/^Bearer (.+)$/)?.[1];
 
-  if (!accessToken) throw new HttpError.Unauthorized('Not authenticated');
+  if (!accessToken)
+    throw new HttpError.Unauthorized("You're not authenticated");
 
   jwt.verify(accessToken, env.AT_SECRET, (error, payload) => {
     if (error || !payload || typeof payload === 'string')
-      throw new HttpError.Unauthorized('Invalid access token');
+      throw new HttpError.Unauthorized("You're not authenticated");
 
     req.user = { id: payload.userId as string };
     next();

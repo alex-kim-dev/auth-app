@@ -84,9 +84,9 @@ const login = async (
     user?.password ?? '',
   );
 
-  if (user?.isBanned) throw new HttpError.Forbidden('User is banned');
   if (!user || !isCorrectPassword)
     throw new HttpError.Unauthorized('Invalid email or password');
+  if (user.isBanned) throw new HttpError.Forbidden("You've been banned");
 
   const tokens = createTokens(user.id);
 
@@ -128,12 +128,13 @@ const refresh = async (req: Request, res: Response) => {
     include: { user: { select: { id: true, name: true, isBanned: true } } },
   });
 
-  if (record?.user.isBanned) throw new HttpError.Forbidden('User is banned');
+  if (record?.user.isBanned)
+    throw new HttpError.Forbidden("You've been banned");
 
   if (!record || record.expiresAt <= new Date()) {
     if (record) await prisma.refreshToken.delete({ where: { hash } });
     res.clearCookie('refreshToken', refreshTokenCookieOptions);
-    throw new HttpError.Forbidden('Invalid refresh token');
+    throw new HttpError.Unauthorized("You're not authenticated");
   }
 
   const { user } = record;
