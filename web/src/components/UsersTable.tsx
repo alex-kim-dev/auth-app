@@ -38,7 +38,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
     <table className='table'>
       <thead className='table__head'>
         <tr className='table__row'>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             <input
               aria-label='select all rows'
               checked={selectedAll}
@@ -48,22 +48,22 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
               onChange={handleSelectAll}
             />
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             ID
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             Name
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             Email
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             Last login
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             Created at
           </th>
-          <th className='table__cell table__header' scope='col'>
+          <th className='table__cell table__col-header' scope='col'>
             Status
           </th>
         </tr>
@@ -83,7 +83,10 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, setUsers }) => {
                 onChange={handleSelectRow(id)}
               />
             </td>
-            <th className='table__cell table__header' scope='row' title={id}>
+            <th
+              className='table__cell table__row-header'
+              scope='row'
+              title={id}>
               {id}
             </th>
             <td className='table__cell'>{user.name}</td>

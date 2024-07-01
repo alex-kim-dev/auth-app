@@ -444,9 +444,14 @@ a:visited {
   background-color: var(--c-secondary);
 }
 
-.table__header {
+.table__col-header {
   text-align: start;
-  overflow-wrap: break-word;
+  white-space: nowrap;
+}
+
+.table__row-header {
+  max-inline-size: 16ch;
+  text-align: start;
 }
 
 .table__cell {
@@ -551,6 +556,10 @@ a:visited {
   .table-wrapper {
     inline-size: 100%;
     margin-inline: 0;
+  }
+
+  .table__row-header {
+    max-inline-size: none;
   }
 
   .modal {
