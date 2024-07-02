@@ -16,6 +16,7 @@ import {
   SignupPage,
   UsersPage,
 } from '~/views';
+import { ProtectedRoute } from '~/components';
 
 const container = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(container);
@@ -26,24 +27,34 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <AuthLayout />,
+        element: <ProtectedRoute scope='not_authenticated' />,
         children: [
           {
-            path: '/',
-            element: <LoginPage />,
-          },
-          {
-            path: '/signup',
-            element: <SignupPage />,
+            element: <AuthLayout />,
+            children: [
+              {
+                path: '/',
+                element: <LoginPage />,
+              },
+              {
+                path: '/signup',
+                element: <SignupPage />,
+              },
+            ],
           },
         ],
       },
       {
-        element: <MainLayout />,
+        element: <ProtectedRoute scope='authenticated' />,
         children: [
           {
-            path: '/users',
-            element: <UsersPage />,
+            element: <MainLayout />,
+            children: [
+              {
+                path: '/users',
+                element: <UsersPage />,
+              },
+            ],
           },
         ],
       },
