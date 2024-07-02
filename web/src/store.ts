@@ -12,9 +12,28 @@ interface GlobalState {
   setAuth: (data: Auth | null) => void;
 }
 
+const storageAuthId = 'auth_app:auth';
+
+const saveAuth = (auth: Auth | null) => {
+  if (auth === null) window.sessionStorage.removeItem(storageAuthId);
+  window.sessionStorage.setItem(storageAuthId, JSON.stringify(auth));
+};
+
+const restoreAuth = () => {
+  try {
+    return JSON.parse(
+      window.sessionStorage.getItem(storageAuthId) ?? '',
+    ) as Auth;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const useGlobalState = create<GlobalState>()((set) => ({
-  auth: null,
+  auth: restoreAuth(),
+
   setAuth: (data) => {
+    saveAuth(data);
     set((state) => ({
       ...state,
       auth: data
@@ -27,6 +46,13 @@ export const useGlobalState = create<GlobalState>()((set) => ({
     }));
   },
 }));
+
+export const getAuth = () => useGlobalState.getState().auth;
+
+export const setAuth = (auth: Auth | null) => {
+  useGlobalState.setState({ auth });
+  saveAuth(auth);
+};
 
 if (process.env.NODE_ENV === 'development') {
   mountStoreDevtool('GlobalState', useGlobalState);

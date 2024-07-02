@@ -1,5 +1,5 @@
 import axios, { AxiosError, isAxiosError } from 'axios';
-import { useGlobalState } from '~/store';
+import { getAuth, setAuth } from '~/store';
 import type {
   User,
   LoginData,
@@ -19,7 +19,7 @@ const axiosPrivate = axios.create(axiosPublic.defaults);
 
 axiosPrivate.interceptors.request.use(
   (config) => {
-    const { auth } = useGlobalState.getState();
+    const auth = getAuth();
     if (auth?.accessToken)
       config.headers.Authorization = `Bearer ${auth.accessToken}`;
     return config;
@@ -37,12 +37,12 @@ axiosPrivate.interceptors.response.use(
     if (res?.status === 401) {
       try {
         const { data } = await api.auth.refresh();
-        useGlobalState.setState({ auth: data });
+        setAuth(data);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return axiosPrivate(config!);
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 403) {
-          useGlobalState.setState({ auth: null });
+          setAuth(null);
           navigateTo('/');
           return Promise.reject(error);
         }
@@ -50,7 +50,7 @@ axiosPrivate.interceptors.response.use(
     }
 
     if ([401, 403].includes(error.response?.status ?? NaN)) {
-      useGlobalState.setState({ auth: null });
+      setAuth(null);
       navigateTo('/');
     }
 
