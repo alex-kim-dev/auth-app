@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import cn from 'clsx';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
+import { CanceledError, isAxiosError } from 'axios';
 import { PasswordField } from '~/components';
 import { api } from '~/api';
 import { useGlobalState } from '~/store';
@@ -72,6 +72,7 @@ export const SignupPage: React.FC = () => {
       setAuth(data);
       navigate('/users');
     } catch (error) {
+      if (error instanceof CanceledError) return;
       if (isAxiosError<MessageResponse>(error))
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',

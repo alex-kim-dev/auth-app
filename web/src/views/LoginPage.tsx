@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import cn from 'clsx';
 import { toast } from 'react-toastify';
-import { isAxiosError } from 'axios';
+import { CanceledError, isAxiosError } from 'axios';
 import { PasswordField } from '~/components';
 import { useGlobalState } from '~/store';
 import { api } from '~/api';
@@ -42,6 +42,7 @@ export const LoginPage: React.FC = () => {
       setAuth(data);
       navigate('/users');
     } catch (error) {
+      if (error instanceof CanceledError) return;
       if (isAxiosError<MessageResponse>(error))
         toast.error(
           error.response?.data.message ?? 'Unexpected error, try again later',
