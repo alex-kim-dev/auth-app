@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink, useNavigate } from 'react-router-dom';
 import cn from 'clsx';
@@ -26,6 +26,12 @@ export const LoginPage: React.FC = () => {
   useLayoutEffect(() => {
     document.title = 'Auth app | Login';
   });
+
+  useEffect(() => {
+    return () => {
+      api.controllers.login?.abort();
+    };
+  }, []);
 
   const onSubmit: SubmitHandler<LoginInputs> = async ({ email, password }) => {
     if (email.length === 0 || password.length === 0) return;
@@ -77,7 +83,13 @@ export const LoginPage: React.FC = () => {
         Login
       </button>
       <div className='auth-form__link'>
-        <NavLink to='/signup'>I don't have an account yet</NavLink>
+        <NavLink
+          to='/signup'
+          onClick={() => {
+            api.controllers.login?.abort();
+          }}>
+          I don't have an account yet
+        </NavLink>
       </div>
     </form>
   );

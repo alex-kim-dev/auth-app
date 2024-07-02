@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { SubmitHandler, useForm, type ValidateResult } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -54,6 +54,12 @@ export const SignupPage: React.FC = () => {
   useLayoutEffect(() => {
     document.title = 'Auth app | Sign up';
   });
+
+  useEffect(() => {
+    return () => {
+      api.controllers.signup?.abort();
+    };
+  }, []);
 
   const onSubmit: SubmitHandler<RegisterInputs> = async ({
     email,
